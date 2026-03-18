@@ -1,3 +1,0 @@
-create table colleges(nos int auto_increment unique ,inst_code varchar(10) primary key,inst_name varchar(100),place varchar(30), dist_code varchar(5), coed varchar(5), type varchar(5),estab varchar(5),affiliation varchar(20) );
-create table courses(nos int auto_increment unique,inst_code varchar(10), branch_code varchar(5), branch_name varchar(100), ocb int,ocg int,bc_ab int ,bc_ag int ,bc_bb int,bc_bg int,bc_cb int,bc_cg int,bc_db int,
-bc_dg int,bc_eb int ,bc_eg int ,scb int ,scg int,stb int ,stg int ,ewsb int ,ewsg int,fee int,primary key(inst_code,branch_code),foreign key(inst_code) references college_details(inst_code) on delete cascade on update cascade);

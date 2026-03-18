@@ -1,0 +1,51 @@
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        </head>
+        <body>
+            <form method="post" action="/colleges/">
+                <h1>COLLEGE SELECTOR</h1>
+                <h3>SELECT COURSES</h3>
+                {% for i in course_types %}
+                    <input class="form-check-input" type="checkbox" name="courses" value='{{i}}' id="course_{{i}}">
+                    <label class="form-check-label" for="course_{{i}}">
+                        {{i}}               
+                    </label>
+                {% endfor %}
+                <br>
+                <h3>SELECT CASTE</h3> 
+                {% for i in caste_types %}
+                    <input class="form-check-input" type="radio" name="caste" value="{{i}}" id="caste_{{i}}">
+                    <label class="form-check-label" for="caste_{{i}}">
+                        {{i}}
+                    </label>
+                {% endfor %}
+                <br>
+                <h3>SELECT GENDER</h3>
+                    <input class="form-check-input" type="radio" name="gender" value="BOY" id="gender_BOY">
+                    <label class="form-check-label" for="gender_BOY">
+                        BOY
+                    </label>
+
+                    <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL">
+                    <label class="form-check-label" for="gender_GIRL">
+                        BOY
+                    </label>
+                <br>
+                <h3>SELECT LAST RANK RANGE</h3>
+
+                <input class="form-control" type="number" name="lower_rank" placeholder="0">
+                <input class="form-control" type="number" name="upper_rank" placeholder="10000">
+                <br>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+            <h3>RESULTS:</h3>
+            {% for i in results %}
+                <h6>College: {{i.college}}</h6>
+                <h6>Course: {{i.course}}</h6>
+                <h6>Last Rank: {{i.last_rank}}</h6>
+                <br>
+            {% endfor %}
+        </body>
+    </html>
