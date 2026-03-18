@@ -4,10 +4,16 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+import os
+
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+templates = Jinja2Templates(
+    directory=os.path.join(BASE_DIR, "templates")
+)
 
 course_types=["CSE", "ECE", "EEE", "MEC", "CIV", "INF", "CSM", "CSD", "CSO", "CSC", "CSA", "CSB", "CSG", "CSN", "AIM", "AI", "AID", "CSW", "ECM", "ECI", "EIE", "CHE", "MET", "CME", "MIN", "MTE", "MCT", "MMS", "BME", "BSE", "AGR", "BIO", "PHE", "AUT", "ANE", "DRG", "EVL", "CIC", "CIC", "FDT", "DTD", "PLG", "GEO", "TEX"]
 caste_types=["OC","BC_A","BC_B","BC_C","BC_D","BC_E","ST","SC","EWS"]
