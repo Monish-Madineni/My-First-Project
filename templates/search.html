@@ -30,7 +30,7 @@
 
                     <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL">
                     <label class="form-check-label" for="gender_GIRL">
-                        BOY
+                        GIRL
                     </label>
                 <br>
                 <h3>SELECT LAST RANK RANGE</h3>
@@ -42,7 +42,7 @@
             </form>
             <h3>RESULTS:</h3>
             {% for i in results %}
-                <h6>College: {{i.college}}</h6>
+                <h6><a href=/colleges/{{i.inst_code}}>College: {{i.college}}</a></h6>
                 <h6>Course: {{i.course}}</h6>
                 <h6>Last Rank: {{i.last_rank}}</h6>
                 <br>

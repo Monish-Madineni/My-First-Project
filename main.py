@@ -98,18 +98,12 @@ class CollegeFilter(BaseModel):
     upper_rank: int| None= None
     fee_lower: int| None= None
     fee_upper: int| None= None
+    gender: str| None=None
 
-@app.post("/colleges/")
-def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),lower_rank: int = Form(None),upper_rank: int = Form(None),gender: str=Form(None)):
-    filters = CollegeFilter(
-        courses=courses,
-        caste=(caste+gender[0]).lower(),
-        lower_rank=lower_rank,
-        upper_rank=upper_rank
-    )
+def db_querying(session: Session, filters: CollegeFilter):
     statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
 
-# COURSE FILTERS
+    # COURSE FILTERS
 
     if filters.courses:
         statement=statement.where(Courses.branch_code.in_(filters.courses))
@@ -141,7 +135,6 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
     if filters.exclude_college_types:
         statement=statement.where(Colleges.type.notin_(filters.exclude_college_types))
 
-    
     results=session.exec(statement).all()
     response = []
 
@@ -150,11 +143,51 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
         response.append({
             "college": college.inst_name,
             "course": course.branch_name,
-            "last_rank": getattr(course,caste_type)
+            "last_rank": getattr(course,caste_type),
+            "inst_code": college.inst_code
         })
-    print(response)
+    return response
+
+
+@app.post("/colleges/")
+def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),lower_rank: int = Form(None),upper_rank: int = Form(None),gender: str=Form(None)):
+    caste=caste or "OC"
+    gender=gender or "BOYS"
+    filters = CollegeFilter(
+        courses=courses,
+        caste=(caste+gender[0]).lower(),
+        lower_rank=lower_rank,
+        upper_rank=upper_rank
+    )
+
+    response=db_querying(session,filters)
 
     return templates.TemplateResponse(
         "search.html",
         {"request": request, "course_types": course_types, "caste_types": caste_types, "results": response }
     )
+
+@app.get("/colleges/{inst_code}")
+def particular_college(session:SessionDep,inst_code):
+    statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
+    statement=statement.where(Colleges.inst_code==inst_code)
+    results=session.exec(statement).all()
+    response = []
+    print(results)
+
+    for college, course in results:
+        response.append({
+            "inst_code": college.inst_code,
+            "inst_name": college.inst_name,
+            "branch_code": course.branch_code,
+            "branch_name": course.branch_name
+        })
+
+    return response
+
+@app.get("/api/colleges/")
+def api_read_colleges( session: SessionDep, filters: CollegeFilter):
+    
+    response=db_querying(session,filters)
+
+    return {"count":len(response),"results":response}
