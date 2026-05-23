@@ -21,6 +21,7 @@ caste_types=["OC","BC_A","BC_B","BC_C","BC_D","BC_E","ST","SC","EWS"]
 def homepage(request: Request):
 
     return templates.TemplateResponse(
+        request,
         "search.html",
         {
             "request": request,
