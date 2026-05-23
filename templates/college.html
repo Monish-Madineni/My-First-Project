@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% if results %}{{results[0][0].inst_name}}{% else %}College Details{% endif %}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <style>
+            :root {
+                --ink: #17212b;
+                --muted: #65748a;
+                --line: #d9e2ec;
+                --page: #f4f7fb;
+                --surface: #ffffff;
+                --primary: #2563eb;
+                --green: #0f8a68;
+            }
+
+            body {
+                min-height: 100vh;
+                margin: 0;
+                color: var(--ink);
+                background: var(--page);
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .topbar {
+                background: var(--surface);
+                border-bottom: 1px solid var(--line);
+            }
+
+            .brand-mark {
+                width: 40px;
+                height: 40px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: 8px;
+                color: #ffffff;
+                background: var(--primary);
+                font-weight: 700;
+            }
+
+            .hero {
+                background: linear-gradient(135deg, #eaf2ff 0%, #f8fbff 58%, #ffffff 100%);
+                border-bottom: 1px solid var(--line);
+            }
+
+            .college-code {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.4rem 0.75rem;
+                border-radius: 999px;
+                color: #174c39;
+                background: #e4f7ef;
+                font-weight: 800;
+            }
+
+            .college-name {
+                max-width: 980px;
+                font-size: clamp(2rem, 4vw, 4rem);
+                line-height: 1.05;
+                letter-spacing: 0;
+            }
+
+            .muted-text {
+                color: var(--muted);
+            }
+
+            .info-card,
+            .branch-card {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                box-shadow: 0 16px 40px rgba(23, 33, 43, 0.06);
+            }
+
+            .section-label {
+                color: var(--muted);
+                font-size: 0.84rem;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+                font-weight: 800;
+            }
+
+            .branch-code {
+                width: 56px;
+                min-width: 56px;
+                height: 44px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: 8px;
+                color: #ffffff;
+                background: var(--primary);
+                font-weight: 800;
+            }
+
+            .branch-card {
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            .branch-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 18px 44px rgba(23, 33, 43, 0.1);
+            }
+
+            .note-list li {
+                margin-bottom: 0.65rem;
+            }
+
+            .rank-details {
+                border-top: 1px solid var(--line);
+            }
+
+            .rank-details summary {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.55rem 0.9rem;
+                border: 1px solid var(--primary);
+                border-radius: 8px;
+                color: var(--primary);
+                background: #ffffff;
+                font-weight: 800;
+                cursor: pointer;
+                list-style: none;
+            }
+
+            .rank-details summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .rank-details summary::after {
+                content: "+";
+                font-size: 1.1rem;
+                line-height: 1;
+            }
+
+            .rank-details[open] summary::after {
+                content: "-";
+            }
+
+            .rank-table th {
+                color: var(--muted);
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+
+            .rank-table td {
+                font-weight: 700;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="topbar py-3">
+            <div class="container d-flex align-items-center justify-content-between gap-3">
+                <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
+                    <span class="brand-mark">CR</span>
+                    <span class="fw-bold">College Rank Project</span>
+                </a>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-primary" href="/">Home</a>
+                </div>
+            </div>
+        </nav>
+
+        <header class="hero py-5">
+            <div class="container">
+                {% if results %}
+                    <span class="college-code mb-3">{{results[0][0].inst_code}}</span>
+                    <h1 class="college-name fw-bold mb-3">{{results[0][0].inst_name}}</h1>
+                    <p class="lead muted-text mb-0">Review the available branches for this college and use the checklist below before adding it to your counselling preference order.</p>
+                {% else %}
+                    <span class="college-code mb-3">No Data</span>
+                    <h1 class="college-name fw-bold mb-3">College details unavailable</h1>
+                    <p class="lead muted-text mb-0">No branch information was found for this college.</p>
+                {% endif %}
+            </div>
+        </header>
+
+        <main class="container py-5">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">Institute code</div>
+                        <div class="stat-value">{% if results %}{{results[0][0].inst_code}}{% else %}-{% endif %}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">Location</div>
+                        <div class="h4 fw-bold mb-1">{% if results %}{{results[0][0].place}}{% else %}-{% endif %}</div>
+                        <p class="muted-text mb-0">{% if results %}District: {{results[0][0].dist_code}}{% else %}No district data{% endif %}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">College profile</div>
+                        <div class="h4 fw-bold mb-1">{% if results %}{{results[0][0].type}} | {{results[0][0].coed}}{% else %}-{% endif %}</div>
+                        <p class="muted-text mb-0">{% if results %}Affiliation: {{results[0][0].affiliation}} | Est. {{results[0][0].estab}}{% else %}No profile data{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">Available branches</div>
+                        <div class="stat-value">{{results|length}}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">Tuition fee</div>
+                        <div class="h4 fw-bold mb-1">{% if results %}Rs. {{results[0][1].fee}}{% else %}-{% endif %}</div>
+                        <p class="muted-text mb-0">Verify final fee from official counselling sources.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card p-4 h-100">
+                        <div class="section-label mb-2">Student action</div>
+                        <div class="h5 fw-bold mb-1">Compare before choosing</div>
+                        <p class="muted-text mb-0">Check cutoff, fees, travel, hostel, and placements.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
+                        <div>
+                            <div class="section-label mb-2">Courses offered</div>
+                            <h2 class="fw-bold mb-0">Branch list</h2>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        {% for college, course in results %}
+                            <article class="branch-card p-3">
+                                <div class="d-flex flex-column flex-xl-row gap-3 align-items-start">
+                                    <span class="branch-code">{{course.branch_code}}</span>
+                                    <div class="w-100">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                                            <div>
+                                                <h3 class="h5 fw-bold mb-1">{{course.branch_name}}</h3>
+                                                <div class="muted-text">Branch code: {{course.branch_code}}</div>
+                                            </div>
+                                            <div class="text-md-end">
+                                                <div class="section-label">Fee</div>
+                                                <div class="fw-bold">Rs. {{course.fee}}</div>
+                                            </div>
+                                        </div>
+
+                                        <details class="rank-details mt-3 pt-3">
+                                            <summary>View all caste ranks</summary>
+                                            <div class="table-responsive mt-3">
+                                                <table class="table table-sm table-bordered align-middle mb-0 rank-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Category</th>
+                                                            <th>Boys</th>
+                                                            <th>Girls</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>OC</td>
+                                                            <td>{{course.ocb}}</td>
+                                                            <td>{{course.ocg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>BC_A</td>
+                                                            <td>{{course.bc_ab}}</td>
+                                                            <td>{{course.bc_ag}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>BC_B</td>
+                                                            <td>{{course.bc_bb}}</td>
+                                                            <td>{{course.bc_bg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>BC_C</td>
+                                                            <td>{{course.bc_cb}}</td>
+                                                            <td>{{course.bc_cg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>BC_D</td>
+                                                            <td>{{course.bc_db}}</td>
+                                                            <td>{{course.bc_dg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>BC_E</td>
+                                                            <td>{{course.bc_eb}}</td>
+                                                            <td>{{course.bc_eg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>SC</td>
+                                                            <td>{{course.scb}}</td>
+                                                            <td>{{course.scg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>ST</td>
+                                                            <td>{{course.stb}}</td>
+                                                            <td>{{course.stg}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>EWS</td>
+                                                            <td>{{course.ewsb}}</td>
+                                                            <td>{{course.ewsg}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </details>
+                                    </div>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="info-card p-4 mb-4">
+                        <div class="section-label mb-2">Counselling checklist</div>
+                        <h2 class="h4 fw-bold">Before selecting this college</h2>
+                        <ul class="note-list muted-text mb-0">
+                            <li>Compare this college with at least three similar options.</li>
+                            <li>Check previous round cutoffs for each branch.</li>
+                            <li>Confirm tuition fee, transport, hostel, and scholarship details.</li>
+                            <li>Review placement records for the branches you prefer.</li>
+                            <li>Verify all information with official counselling sources.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card p-4">
+                        <div class="section-label mb-2">Preference tip</div>
+                        <p class="muted-text mb-0">Place branches in the order you actually want to study them. A higher-ranked branch is not always better if it does not match your interests or career plan.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

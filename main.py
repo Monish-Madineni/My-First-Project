@@ -6,7 +6,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import os
 
-
 app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +17,7 @@ templates = Jinja2Templates(
 course_types=["CSE", "ECE", "EEE", "MEC", "CIV", "INF", "CSM", "CSD", "CSO", "CSC", "CSA", "CSB", "CSG", "CSN", "AIM", "AI", "AID", "CSW", "ECM", "ECI", "EIE", "CHE", "MET", "CME", "MIN", "MTE", "MCT", "MMS", "BME", "BSE", "AGR", "BIO", "PHE", "AUT", "ANE", "DRG", "EVL", "CIC", "CIC", "FDT", "DTD", "PLG", "GEO", "TEX"]
 caste_types=["OC","BC_A","BC_B","BC_C","BC_D","BC_E","ST","SC","EWS"]
 
-@app.get("/")
+@app.get("/search/")
 def homepage(request: Request):
 
     return templates.TemplateResponse(
@@ -104,6 +103,10 @@ def db_querying(session: Session, filters: CollegeFilter):
     statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
 
     # COURSE FILTERS
+    if filters.lower_rank==None:
+        filters.lower_rank=0
+    if filters.upper_rank==None:
+        filters.upper_rank=10000
 
     if filters.courses:
         statement=statement.where(Courses.branch_code.in_(filters.courses))
@@ -134,6 +137,7 @@ def db_querying(session: Session, filters: CollegeFilter):
         statement=statement.where(Colleges.type.in_(filters.include_college_types))
     if filters.exclude_college_types:
         statement=statement.where(Colleges.type.notin_(filters.exclude_college_types))
+    statement = statement.order_by(caste_column.asc())
 
     results=session.exec(statement).all()
     response = []
@@ -147,12 +151,20 @@ def db_querying(session: Session, filters: CollegeFilter):
             "inst_code": college.inst_code
         })
     return response
+@app.get("/")
+def homepage(request: Request ):
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request}
+    )
 
-
-@app.post("/colleges/")
+@app.post("/search_results")
 def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),lower_rank: int = Form(None),upper_rank: int = Form(None),gender: str=Form(None)):
     caste=caste or "OC"
     gender=gender or "BOYS"
+    lower_rank=lower_rank or 0
+    upper_rank=upper_rank or 10000
+    courses=courses or ["CSE"]
     filters = CollegeFilter(
         courses=courses,
         caste=(caste+gender[0]).lower(),
@@ -164,26 +176,28 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
 
     return templates.TemplateResponse(
         "search.html",
-        {"request": request, "course_types": course_types, "caste_types": caste_types, "results": response }
+        {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_lowerrank":lower_rank,"selected_upperrank":upper_rank, "results": response }
     )
 
 @app.get("/colleges/{inst_code}")
-def particular_college(session:SessionDep,inst_code):
+def particular_college(session:SessionDep,request: Request,inst_code):
     statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
     statement=statement.where(Colleges.inst_code==inst_code)
     results=session.exec(statement).all()
-    response = []
-    print(results)
+    # response = []
+    # for college, course in results:
+    #     response.append({
+    #         "inst_code": college.inst_code,
+    #         "inst_name": college.inst_name,
+    #         "branch_code": course.branch_code,
+    #         "branch_name": course.branch_name
+    #     })
 
-    for college, course in results:
-        response.append({
-            "inst_code": college.inst_code,
-            "inst_name": college.inst_name,
-            "branch_code": course.branch_code,
-            "branch_name": course.branch_name
-        })
-
-    return response
+    return templates.TemplateResponse(
+        "college.html",
+        {"request": request,"results": results}
+    )
+    
 
 @app.get("/api/colleges/")
 def api_read_colleges( session: SessionDep, filters: CollegeFilter):

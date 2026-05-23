@@ -2,50 +2,187 @@
     <html>
         <head>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+            <style>
+                body {
+                    min-height: 100vh;
+                    background: #f4f7fb;
+                    color: #17212b;
+                    font-family: Arial, Helvetica, sans-serif;
+                }
+
+                .topbar {
+                    background: #ffffff;
+                    border-bottom: 1px solid #d9e2ec;
+                }
+
+                .brand-mark {
+                    width: 40px;
+                    height: 40px;
+                    display: inline-grid;
+                    place-items: center;
+                    border-radius: 8px;
+                    color: #ffffff;
+                    background: #2563eb;
+                    font-weight: 700;
+                }
+
+                .page-header {
+                    background: linear-gradient(135deg, #eaf2ff 0%, #f8fbff 58%, #ffffff 100%);
+                    border-bottom: 1px solid #d9e2ec;
+                }
+
+                .selector-card,
+                .result-card {
+                    background: #ffffff;
+                    border: 1px solid #d9e2ec;
+                    border-radius: 8px;
+                    box-shadow: 0 16px 40px rgba(23, 33, 43, 0.06);
+                }
+
+                .section-title {
+                    margin-top: 1.6rem;
+                    margin-bottom: 0.8rem;
+                    color: #17212b;
+                    font-size: 1rem;
+                    font-weight: 800;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                }
+
+                .options-wrap {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.55rem 0.85rem;
+                }
+
+                .form-check-input {
+                    margin-right: 0.25rem;
+                }
+
+                .form-check-label {
+                    margin-right: 0.55rem;
+                    padding: 0.25rem 0;
+                    font-weight: 600;
+                }
+
+                .form-control {
+                    min-height: 46px;
+                    border-color: #d9e2ec;
+                }
+
+                .form-control:focus {
+                    border-color: #2563eb;
+                    box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.15);
+                }
+
+                .results-title {
+                    color: #17212b;
+                    font-weight: 800;
+                    letter-spacing: 0.04em;
+                }
+
+                .result-card a {
+                    color: #1e40af;
+                    font-weight: 800;
+                    text-decoration: none;
+                }
+
+                .result-card a:hover {
+                    text-decoration: underline;
+                }
+
+                .rank-pill {
+                    display: inline-block;
+                    padding: 0.35rem 0.75rem;
+                    border-radius: 999px;
+                    color: #086044;
+                    background: #e4f7ef;
+                    font-weight: 800;
+                }
+            </style>
         </head>
         <body>
-            <form method="post" action="/colleges/">
-                <h1>COLLEGE SELECTOR</h1>
-                <h3>SELECT COURSES</h3>
+            <nav class="topbar py-3">
+                <div class="container d-flex align-items-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="brand-mark">CR</span>
+                        <span class="fw-bold">College Rank Project</span>
+                    </div>
+                    <a class="btn btn-outline-primary" href="/">Home</a>
+                </div>
+            </nav>
+
+            <header class="page-header py-5">
+                <div class="container">
+                    <span class="badge text-bg-primary mb-3">College selector</span>
+                    <h1 class="display-4 fw-bold mb-3">COLLEGE SELECTOR</h1>
+                    <p class="lead text-secondary mb-0">Choose your course, category, gender, and rank range to view matching colleges.</p>
+                </div>
+            </header>
+
+            <main class="container py-5">
+            <form method="post" action="/search_results/" class="selector-card p-3 p-md-4 mb-5">
+                <h1 class="visually-hidden">COLLEGE SELECTOR</h1>
+                <h3 class="section-title">SELECT COURSES</h3>
+                <div class="options-wrap">
                 {% for i in course_types %}
-                    <input class="form-check-input" type="checkbox" name="courses" value='{{i}}' id="course_{{i}}">
+                    <input class="form-check-input" type="checkbox" name="courses" value='{{i}}' id="course_{{i}}" 
+                    {%if selected_courses%}
+                        {%if i in selected_courses%}checked{% endif %}
+                    {%elif i=="CSE"%}checked{%endif%}
+                    >
                     <label class="form-check-label" for="course_{{i}}">
                         {{i}}               
                     </label>
                 {% endfor %}
+                </div>
                 <br>
-                <h3>SELECT CASTE</h3> 
+                <h3 class="section-title">SELECT CASTE</h3> 
+                <div class="options-wrap">
                 {% for i in caste_types %}
-                    <input class="form-check-input" type="radio" name="caste" value="{{i}}" id="caste_{{i}}">
+                    <input class="form-check-input" type="radio" name="caste" value="{{i}}" id="caste_{{i}}" {% if i == selected_caste or (not selected_caste and i == "OC") %}checked{% endif %}>
                     <label class="form-check-label" for="caste_{{i}}">
                         {{i}}
                     </label>
                 {% endfor %}
+                </div>
                 <br>
-                <h3>SELECT GENDER</h3>
-                    <input class="form-check-input" type="radio" name="gender" value="BOY" id="gender_BOY">
+                <h3 class="section-title">SELECT GENDER</h3>
+                <div class="options-wrap">
+                    <input class="form-check-input" type="radio" name="gender" value="BOY" id="gender_BOY" {%if selected_gender=="BOY" or not selected_gender%}checked{% endif %}>
                     <label class="form-check-label" for="gender_BOY">
                         BOY
                     </label>
 
-                    <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL">
+                    <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL"  {%if selected_gender=="GIRL"%}checked{% endif %}>
                     <label class="form-check-label" for="gender_GIRL">
                         GIRL
                     </label>
+                </div>
                 <br>
-                <h3>SELECT LAST RANK RANGE</h3>
-
-                <input class="form-control" type="number" name="lower_rank" placeholder="0">
-                <input class="form-control" type="number" name="upper_rank" placeholder="10000">
+                <h3 class="section-title">SELECT LAST RANK RANGE</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                <input class="form-control" type="number" name="lower_rank" {%if selected_lowerrank%} value="{{selected_lowerrank}}" {%else%}value="0"{%endif%}>
+                    </div>
+                    <div class="col-md-6">
+                <input class="form-control" type="number" name="upper_rank" {%if selected_upperrank%} value="{{selected_upperrank}}" {%else%}value="10000"{%endif%}>
+                    </div>
+                </div>
                 <br>
-                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="submit" class="btn btn-primary btn-lg px-5">Search</button>
             </form>
-            <h3>RESULTS:</h3>
+            <h3 class="results-title mb-3">RESULTS:</h3>
+            <div class="d-grid gap-3">
             {% for i in results %}
+                <div class="result-card p-3">
                 <h6><a href=/colleges/{{i.inst_code}}>College: {{i.college}}</a></h6>
                 <h6>Course: {{i.course}}</h6>
-                <h6>Last Rank: {{i.last_rank}}</h6>
+                <h6><span class="rank-pill">Last Rank: {{i.last_rank}}</span></h6>
+                </div>
                 <br>
             {% endfor %}
+            </div>
+            </main>
         </body>
     </html>
