@@ -154,6 +154,7 @@ def db_querying(session: Session, filters: CollegeFilter):
 @app.get("/")
 def homepage(request: Request ):
     return templates.TemplateResponse(
+        request,
         "home.html",
         {"request": request}
     )
@@ -175,6 +176,7 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
     response=db_querying(session,filters)
 
     return templates.TemplateResponse(
+        request,
         "search.html",
         {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_lowerrank":lower_rank,"selected_upperrank":upper_rank, "results": response }
     )
@@ -194,6 +196,7 @@ def particular_college(session:SessionDep,request: Request,inst_code):
     #     })
 
     return templates.TemplateResponse(
+        request,
         "college.html",
         {"request": request,"results": results}
     )
