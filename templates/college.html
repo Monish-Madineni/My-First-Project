@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% if results %}{{results[0][0].inst_name}}{% else %}College Details{% endif %}</title>
+        <title>{% if results %}{{results[0][0].inst_name}} | mycollegelist.xyz{% else %}mycollegelist.xyz{% endif %}</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <style>
             :root {
@@ -29,15 +29,15 @@
                 border-bottom: 1px solid var(--line);
             }
 
-            .brand-mark {
-                width: 40px;
-                height: 40px;
-                display: inline-grid;
-                place-items: center;
-                border-radius: 8px;
-                color: #ffffff;
-                background: var(--primary);
-                font-weight: 700;
+            .brand-name {
+                color: var(--ink);
+                font-size: 1.35rem;
+                font-weight: 900;
+                letter-spacing: 0;
+            }
+
+            .brand-name span {
+                color: var(--primary);
             }
 
             .hero {
@@ -159,8 +159,7 @@
         <nav class="topbar py-3">
             <div class="container d-flex align-items-center justify-content-between gap-3">
                 <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
-                    <span class="brand-mark">CR</span>
-                    <span class="fw-bold">College Rank Project</span>
+                    <span class="brand-name">MyCollege<span>List</span></span>
                 </a>
                 <div class="d-flex gap-2">
                     <a class="btn btn-outline-primary" href="/">Home</a>

@@ -1,6 +1,7 @@
     <!DOCTYPE html>
     <html>
         <head>
+            <title>mycollegelist.xyz</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
             <style>
                 body {
@@ -15,15 +16,15 @@
                     border-bottom: 1px solid #d9e2ec;
                 }
 
-                .brand-mark {
-                    width: 40px;
-                    height: 40px;
-                    display: inline-grid;
-                    place-items: center;
-                    border-radius: 8px;
-                    color: #ffffff;
-                    background: #2563eb;
-                    font-weight: 700;
+                .brand-name {
+                    color: #17212b;
+                    font-size: 1.35rem;
+                    font-weight: 900;
+                    letter-spacing: 0;
+                }
+
+                .brand-name span {
+                    color: #2563eb;
                 }
 
                 .page-header {
@@ -53,6 +54,38 @@
                     display: flex;
                     flex-wrap: wrap;
                     gap: 0.55rem 0.85rem;
+                }
+
+                .course-option {
+                    position: relative;
+                    border-radius: 6px;
+                    cursor: help;
+                }
+
+                .course-option::after {
+                    content: attr(data-full);
+                    position: absolute;
+                    left: 0;
+                    bottom: calc(100% + 8px);
+                    z-index: 10;
+                    width: max-content;
+                    max-width: 280px;
+                    padding: 0.45rem 0.65rem;
+                    border-radius: 6px;
+                    color: #ffffff;
+                    background: #17212b;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    line-height: 1.25;
+                    opacity: 0;
+                    pointer-events: none;
+                    transform: translateY(4px);
+                    transition: opacity 0.15s ease, transform 0.15s ease;
+                }
+
+                .course-option:hover::after {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
 
                 .form-check-input {
@@ -104,25 +137,24 @@
         <body>
             <nav class="topbar py-3">
                 <div class="container d-flex align-items-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="brand-mark">CR</span>
-                        <span class="fw-bold">College Rank Project</span>
-                    </div>
+                    <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
+                        <span class="brand-name">MyCollege<span>List</span></span>
+                    </a>
                     <a class="btn btn-outline-primary" href="/">Home</a>
                 </div>
             </nav>
 
             <header class="page-header py-5">
                 <div class="container">
-                    <span class="badge text-bg-primary mb-3">College selector</span>
-                    <h1 class="display-4 fw-bold mb-3">COLLEGE SELECTOR</h1>
+                    <span class="badge text-bg-primary mb-3">MyCollegeList</span>
+                    <h1 class="display-4 fw-bold mb-3">College Selector</h1>
                     <p class="lead text-secondary mb-0">Choose your course, category, gender, and rank range to view matching colleges.</p>
                 </div>
             </header>
 
             <main class="container py-5">
             <form method="post" action="/search_results" class="selector-card p-3 p-md-4 mb-5">
-                <h1 class="visually-hidden">COLLEGE SELECTOR</h1>
+                <h1 class="visually-hidden">College Selector</h1>
                 <h3 class="section-title">SELECT COURSES</h3>
                 <div class="options-wrap">
                 {% for i in course_types %}
@@ -131,7 +163,7 @@
                         {%if i in selected_courses%}checked{% endif %}
                     {%elif i=="CSE"%}checked{%endif%}
                     >
-                    <label class="form-check-label" for="course_{{i}}">
+                    <label class="form-check-label course-option" for="course_{{i}}" data-full="{% if i == 'CSE' %}Computer Science and Engineering{% elif i == 'ECE' %}Electronics and Communication Engineering{% elif i == 'EEE' %}Electrical and Electronics Engineering{% elif i == 'MEC' %}Mechanical Engineering{% elif i == 'CIV' %}Civil Engineering{% elif i == 'INF' %}Information Technology{% elif i == 'CSM' %}Computer Science and Engineering (Artificial Intelligence and Machine Learning){% elif i == 'CSD' %}Computer Science and Engineering (Data Science){% elif i == 'CSO' %}Computer Science and Engineering (Internet of Things){% elif i == 'CSC' %}Computer Science and Engineering (Cyber Security){% elif i == 'CSA' %}Computer Science and Engineering (Artificial Intelligence){% elif i == 'CSB' %}Computer Science and Business Systems{% elif i == 'CSG' %}Computer Science and Engineering (Artificial Intelligence and Data Science){% elif i == 'CSN' %}Computer Science and Engineering (Networks){% elif i == 'AIM' %}Artificial Intelligence and Machine Learning{% elif i == 'AI' %}Artificial Intelligence{% elif i == 'AID' %}Artificial Intelligence and Data Science{% elif i == 'CSW' %}Computer Science and Engineering (Software Engineering){% elif i == 'ECM' %}Electronics and Computer Engineering{% elif i == 'ECI' %}Electronics, Communication and Instrumentation Engineering{% elif i == 'EIE' %}Electronics and Instrumentation Engineering{% elif i == 'CHE' %}Chemical Engineering{% elif i == 'MET' %}Metallurgical Engineering{% elif i == 'CME' %}Computer Engineering{% elif i == 'MIN' %}Mining Engineering{% elif i == 'MTE' %}Metallurgical and Materials Engineering{% elif i == 'MCT' %}Mechanical CAD/CAM Technology{% elif i == 'MMS' %}Mechanical and Mechatronics Engineering{% elif i == 'BME' %}Biomedical Engineering{% elif i == 'BSE' %}Bio Science Engineering{% elif i == 'AGR' %}Agricultural Engineering{% elif i == 'BIO' %}Bio-Technology{% elif i == 'PHE' %}Pharmaceutical Engineering{% elif i == 'AUT' %}Automobile Engineering{% elif i == 'ANE' %}Aeronautical Engineering{% elif i == 'DRG' %}Dairy Technology{% elif i == 'EVL' %}Electronics Engineering (VLSI Design and Technology){% elif i == 'CIC' %}CSE (IoT and Cyber Security including Blockchain Technology){% elif i == 'FDT' %}Food Technology{% elif i == 'DTD' %}Digital Techniques for Design and Planning{% elif i == 'PLG' %}Planning{% elif i == 'GEO' %}Geo Informatics{% elif i == 'TEX' %}Textile Technology{% else %}{{i}}{% endif %}" title="{% if i == 'CSE' %}Computer Science and Engineering{% elif i == 'ECE' %}Electronics and Communication Engineering{% elif i == 'EEE' %}Electrical and Electronics Engineering{% elif i == 'MEC' %}Mechanical Engineering{% elif i == 'CIV' %}Civil Engineering{% elif i == 'INF' %}Information Technology{% elif i == 'CSM' %}Computer Science and Engineering (Artificial Intelligence and Machine Learning){% elif i == 'CSD' %}Computer Science and Engineering (Data Science){% elif i == 'CSO' %}Computer Science and Engineering (Internet of Things){% elif i == 'CSC' %}Computer Science and Engineering (Cyber Security){% elif i == 'CSA' %}Computer Science and Engineering (Artificial Intelligence){% elif i == 'CSB' %}Computer Science and Business Systems{% elif i == 'CSG' %}Computer Science and Engineering (Artificial Intelligence and Data Science){% elif i == 'CSN' %}Computer Science and Engineering (Networks){% elif i == 'AIM' %}Artificial Intelligence and Machine Learning{% elif i == 'AI' %}Artificial Intelligence{% elif i == 'AID' %}Artificial Intelligence and Data Science{% elif i == 'CSW' %}Computer Science and Engineering (Software Engineering){% elif i == 'ECM' %}Electronics and Computer Engineering{% elif i == 'ECI' %}Electronics, Communication and Instrumentation Engineering{% elif i == 'EIE' %}Electronics and Instrumentation Engineering{% elif i == 'CHE' %}Chemical Engineering{% elif i == 'MET' %}Metallurgical Engineering{% elif i == 'CME' %}Computer Engineering{% elif i == 'MIN' %}Mining Engineering{% elif i == 'MTE' %}Metallurgical and Materials Engineering{% elif i == 'MCT' %}Mechanical CAD/CAM Technology{% elif i == 'MMS' %}Mechanical and Mechatronics Engineering{% elif i == 'BME' %}Biomedical Engineering{% elif i == 'BSE' %}Bio Science Engineering{% elif i == 'AGR' %}Agricultural Engineering{% elif i == 'BIO' %}Bio-Technology{% elif i == 'PHE' %}Pharmaceutical Engineering{% elif i == 'AUT' %}Automobile Engineering{% elif i == 'ANE' %}Aeronautical Engineering{% elif i == 'DRG' %}Dairy Technology{% elif i == 'EVL' %}Electronics Engineering (VLSI Design and Technology){% elif i == 'CIC' %}CSE (IoT and Cyber Security including Blockchain Technology){% elif i == 'FDT' %}Food Technology{% elif i == 'DTD' %}Digital Techniques for Design and Planning{% elif i == 'PLG' %}Planning{% elif i == 'GEO' %}Geo Informatics{% elif i == 'TEX' %}Textile Technology{% else %}{{i}}{% endif %}">
                         {{i}}               
                     </label>
                 {% endfor %}
@@ -186,3 +218,4 @@
             </main>
         </body>
     </html>
+
