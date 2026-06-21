@@ -40,8 +40,56 @@ class Colleges(SQLModel, table=True):
     type: str| None = None
     estab: str| None= None
     affiliation: str| None
-class Courses(SQLModel, table=True):
+class Courses_LastRank(SQLModel, table=True):
     __tablename__='courses'
+    inst_code: str| None = Field(default=None,primary_key=True)
+    branch_code: str| None = Field(default= None,primary_key=True)
+    branch_name: str| None= None
+    ocb: int| None= None
+    ocg: int| None= None
+    bc_ab: int| None= None
+    bc_ag: int| None= None
+    bc_bb: int| None= None
+    bc_bg: int| None= None
+    bc_cb: int| None= None
+    bc_cg: int| None= None
+    bc_db: int| None= None
+    bc_dg: int| None= None
+    bc_eb: int| None= None
+    bc_eg: int| None= None
+    scb: int| None= None
+    scg: int| None= None
+    stb: int| None= None
+    stg: int| None= None
+    ewsb: int| None= None
+    ewsg: int| None= None
+    fee: int| None= None
+class Courses_phase1(SQLModel, table=True):
+    __tablename__='courses_phase1'
+    inst_code: str| None = Field(default=None,primary_key=True)
+    branch_code: str| None = Field(default= None,primary_key=True)
+    branch_name: str| None= None
+    ocb: int| None= None
+    ocg: int| None= None
+    bc_ab: int| None= None
+    bc_ag: int| None= None
+    bc_bb: int| None= None
+    bc_bg: int| None= None
+    bc_cb: int| None= None
+    bc_cg: int| None= None
+    bc_db: int| None= None
+    bc_dg: int| None= None
+    bc_eb: int| None= None
+    bc_eg: int| None= None
+    scb: int| None= None
+    scg: int| None= None
+    stb: int| None= None
+    stg: int| None= None
+    ewsb: int| None= None
+    ewsg: int| None= None
+    fee: int| None= None
+class Courses_phase2(SQLModel, table=True):
+    __tablename__='courses_phase2'
     inst_code: str| None = Field(default=None,primary_key=True)
     branch_code: str| None = Field(default= None,primary_key=True)
     branch_name: str| None= None
@@ -99,9 +147,17 @@ class CollegeFilter(BaseModel):
     fee_lower: int| None= None
     fee_upper: int| None= None
     gender: str| None=None
+    phase: int| None=None
 
 def db_querying(session: Session, filters: CollegeFilter):
-    statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
+    if filters.phase==1:
+        course_table=Courses_phase1
+    elif filters.phase==2:
+        course_table=Courses_phase2
+    else:
+        course_table=Courses_LastRank
+
+    statement=(select(Colleges,course_table).join(course_table,Colleges.inst_code==course_table.inst_code))
 
     # COURSE FILTERS
     if filters.lower_rank==None:
@@ -110,13 +166,18 @@ def db_querying(session: Session, filters: CollegeFilter):
         filters.upper_rank=10000
 
     if filters.courses:
-        statement=statement.where(Courses.branch_code.in_(filters.courses))
+        statement=statement.where(course_table.branch_code.in_(filters.courses))
+        
     
     if filters.caste:
         caste_type=filters.caste
     else:
         caste_type="ocb"
-    caste_column=getattr(Courses,caste_type)
+
+
+    caste_column=getattr(course_table,caste_type)
+
+
     if filters.lower_rank is not None:
         statement=statement.where(caste_column>=filters.lower_rank)
     if filters.upper_rank is not None:
@@ -161,17 +222,19 @@ def homepage(request: Request ):
     )
 
 @app.post("/search_results")
-def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),lower_rank: int = Form(None),upper_rank: int = Form(None),gender: str=Form(None)):
+def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),lower_rank: int = Form(None),upper_rank: int = Form(None),gender: str=Form(None),phase: int = Form(None)):
     caste=caste or "OC"
     gender=gender or "BOYS"
     lower_rank=lower_rank or 0
     upper_rank=upper_rank or 10000
     courses=courses or ["CSE"]
+    phase=phase or 3
     filters = CollegeFilter(
         courses=courses,
         caste=(caste+gender[0]).lower(),
         lower_rank=lower_rank,
-        upper_rank=upper_rank
+        upper_rank=upper_rank,
+        phase=phase
     )
 
     response=db_querying(session,filters)
@@ -179,12 +242,12 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
     return templates.TemplateResponse(
         request,
         "search.html",
-        {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_lowerrank":lower_rank,"selected_upperrank":upper_rank, "results": response }
+        {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_lowerrank":lower_rank,"selected_upperrank":upper_rank,"selected_phase":phase, "results": response }
     )
 
 @app.get("/colleges/{inst_code}")
 def particular_college(session:SessionDep,request: Request,inst_code):
-    statement=(select(Colleges,Courses).join(Courses,Colleges.inst_code==Courses.inst_code))
+    statement=(select(Colleges,Courses_LastRank).join(Courses_LastRank,Colleges.inst_code==Courses_LastRank.inst_code))
     statement=statement.where(Colleges.inst_code==inst_code)
     results=session.exec(statement).all()
     # response = []

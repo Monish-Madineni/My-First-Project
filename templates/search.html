@@ -192,6 +192,22 @@
                     </label>
                 </div>
                 <br>
+                <h3 class="section-title">SELECT PHASE</h3>
+                <div class="options-wrap">
+                    <input class="form-check-input" type="radio" name="phase" value=3 id="LastRank" {% if selected_phase == 3 or not selected_phase %}checked{% endif %}>
+                    <label class="form-check-label" for="LastRank">
+                        Last Phase/Last Rank
+                    </label>
+                    <input class="form-check-input" type="radio" name="phase" value=2 id="phase2" {% if selected_phase == 2 %}checked{% endif %}>
+                    <label class="form-check-label" for="phase2">
+                        Phase 2
+                    </label>
+                    <input class="form-check-input" type="radio" name="phase" value=1 id="phase1" {% if selected_phase == 1 %}checked{% endif %}>
+                    <label class="form-check-label" for="phase1">
+                        Phase 1
+                    </label>
+                </div>
+                <br>
                 <h3 class="section-title">SELECT LAST RANK RANGE</h3>
                 <div class="row g-3">
                     <div class="col-md-6">
