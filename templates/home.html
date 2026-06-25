@@ -12,156 +12,654 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>mycollegelist.xyz</title>
+        <title>MyCollegeList | TG EAPCET college predictor</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <style>
             :root {
-                --ink: #17212b;
-                --muted: #627084;
-                --line: #d9e1ea;
+                --ink: #0f172a;
+                --muted: #64748b;
+                --line: #dbe4f0;
+                --page: #f8fafc;
                 --surface: #ffffff;
-                --soft: #f5f8fb;
-                --primary: #2563eb;
-                --accent: #0f9f7f;
+                --surface-soft: #eef4ff;
+                --primary: #2457f5;
+                --primary-strong: #183fc3;
+                --success: #059669;
+                --warning: #d97706;
+                --danger: #dc2626;
+                --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+                --shadow-hover: 0 22px 60px rgba(15, 23, 42, 0.12);
+                --radius: 8px;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
             }
 
             body {
                 margin: 0;
                 color: var(--ink);
-                background: var(--soft);
-                font-family: Arial, Helvetica, sans-serif;
+                background:
+                    radial-gradient(circle at top left, rgba(36, 87, 245, 0.08), transparent 28%),
+                    radial-gradient(circle at top right, rgba(5, 150, 105, 0.07), transparent 24%),
+                    var(--page);
+                font-family: "Inter", "Segoe UI", Arial, sans-serif;
             }
 
-            .navbar {
-                background: var(--surface);
-                border-bottom: 1px solid var(--line);
+            h1,
+            h2,
+            h3,
+            .brand-name {
+                font-family: "Space Grotesk", "Inter", sans-serif;
+                letter-spacing: 0;
+            }
+
+            .site-nav {
+                position: sticky;
+                top: 0;
+                z-index: 40;
+                background: rgba(255, 255, 255, 0.92);
+                border-bottom: 1px solid rgba(219, 228, 240, 0.92);
+                backdrop-filter: blur(14px);
             }
 
             .brand-name {
                 color: var(--ink);
                 font-size: 1.35rem;
-                font-weight: 900;
-                letter-spacing: 0;
+                font-weight: 800;
+                text-decoration: none;
             }
 
             .brand-name span {
                 color: var(--primary);
             }
 
-            .hero {
-                background: linear-gradient(135deg, #eaf2ff 0%, #f7fbf8 55%, #ffffff 100%);
-                border-bottom: 1px solid var(--line);
-            }
-
-            .hero h1 {
-                max-width: 760px;
-                font-size: clamp(2rem, 4vw, 4.25rem);
-                line-height: 1.05;
-                letter-spacing: 0;
-            }
-
-            .hero p {
-                max-width: 640px;
-                color: var(--muted);
-                font-size: 1.08rem;
-            }
-
-            .hero-panel {
-                background: var(--surface);
+            .nav-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.45rem;
+                padding: 0.45rem 0.75rem;
                 border: 1px solid var(--line);
-                border-radius: 8px;
-                box-shadow: 0 18px 45px rgba(23, 33, 43, 0.08);
+                border-radius: 999px;
+                background: #fff;
+                color: var(--muted);
+                font-size: 0.86rem;
+                font-weight: 700;
             }
 
-            .section-title {
-                font-size: 0.86rem;
+            .college-search {
+                position: relative;
+                max-width: 460px;
+                width: 100%;
+            }
+
+            .college-search .form-control,
+            .college-search .btn {
+                min-height: 44px;
+                border-radius: var(--radius);
+            }
+
+            .college-search .form-control {
+                border-color: var(--line);
+                box-shadow: none;
+            }
+
+            .college-search .form-control:focus {
+                border-color: rgba(36, 87, 245, 0.45);
+                box-shadow: 0 0 0 0.2rem rgba(36, 87, 245, 0.08);
+            }
+
+            .college-suggestions {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                right: 0;
+                z-index: 50;
+                display: none;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow-hover);
+            }
+
+            .college-suggestions.show {
+                display: block;
+            }
+
+            .suggestion-item {
+                width: 100%;
+                padding: 0.85rem 0.95rem;
+                border: 0;
+                border-bottom: 1px solid var(--line);
+                background: #ffffff;
+                text-align: left;
+                transition: background 0.15s ease;
+            }
+
+            .suggestion-item:last-child {
+                border-bottom: 0;
+            }
+
+            .suggestion-item:hover {
+                background: #f6f9ff;
+            }
+
+            .suggestion-code {
+                color: var(--primary);
+                font-weight: 800;
+            }
+
+            .suggestion-name {
                 color: var(--muted);
+                font-size: 0.92rem;
+            }
+
+            .hero-shell {
+                position: relative;
+                overflow: hidden;
+                padding: 4rem 0 3rem;
+                border-bottom: 1px solid rgba(219, 228, 240, 0.9);
+            }
+
+            .hero-shell::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    linear-gradient(135deg, rgba(36, 87, 245, 0.06), transparent 40%),
+                    linear-gradient(315deg, rgba(5, 150, 105, 0.05), transparent 36%);
+                pointer-events: none;
+            }
+
+            .hero-shell .container {
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-eyebrow {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.45rem;
+                padding: 0.42rem 0.75rem;
+                border: 1px solid rgba(36, 87, 245, 0.18);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.72);
+                color: var(--primary-strong);
+                font-size: 0.84rem;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+            }
+
+            .hero-title {
+                max-width: 15ch;
+                margin: 0;
+                font-size: clamp(2.4rem, 5vw, 4.8rem);
+                line-height: 0.98;
+                letter-spacing: -0.03em;
+            }
+
+            .hero-copy {
+                max-width: 64ch;
+                color: var(--muted);
+                font-size: 1.06rem;
+                line-height: 1.7;
+            }
+
+            .hero-actions .btn {
+                min-height: 50px;
+                padding-inline: 1.2rem;
+                border-radius: var(--radius);
+                font-weight: 800;
+            }
+
+            .hero-badges,
+            .trust-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.6rem;
+            }
+
+            .mini-pill,
+            .trust-pill,
+            .feature-pill,
+            .meta-pill,
+            .compact-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                border-radius: 999px;
                 font-weight: 700;
+            }
+
+            .mini-pill,
+            .trust-pill {
+                padding: 0.45rem 0.75rem;
+                border: 1px solid var(--line);
+                background: #ffffff;
+                color: var(--muted);
+                font-size: 0.88rem;
+            }
+
+            .trust-pill strong {
+                color: var(--ink);
+            }
+
+            .hero-preview {
+                padding: 1.35rem;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 250, 255, 0.96));
+                box-shadow: var(--shadow);
+            }
+
+            .preview-top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .preview-metric-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .preview-metric {
+                padding: 0.95rem;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #fff;
+            }
+
+            .preview-value {
+                color: var(--ink);
+                font-size: 1.35rem;
+                font-weight: 800;
+            }
+
+            .preview-label {
+                color: var(--muted);
+                font-size: 0.86rem;
+                font-weight: 600;
+            }
+
+            .preview-list {
+                display: grid;
+                gap: 0.65rem;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+            .preview-list li {
+                display: flex;
+                gap: 0.7rem;
+                align-items: flex-start;
+                padding: 0.75rem 0.8rem;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+            }
+
+            .preview-bullet {
+                width: 28px;
+                height: 28px;
+                flex: 0 0 28px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: 999px;
+                background: rgba(36, 87, 245, 0.12);
+                color: var(--primary);
+                font-weight: 900;
+            }
+
+            .section-label {
+                color: var(--primary);
+                font-size: 0.82rem;
+                font-weight: 900;
                 letter-spacing: 0.08em;
                 text-transform: uppercase;
             }
 
-            .stat-band {
-                background: var(--ink);
-                color: #ffffff;
+            .section-title {
+                font-size: clamp(1.7rem, 3vw, 2.7rem);
+                line-height: 1.05;
+                letter-spacing: -0.02em;
+            }
+
+            .section-copy {
+                color: var(--muted);
+                line-height: 1.7;
+            }
+
+            .stat-strip {
+                margin-top: -0.75rem;
+                padding-bottom: 2.75rem;
+            }
+
+            .stat-panel {
+                padding: 1.2rem;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow);
+            }
+
+            .stat-card {
+                padding: 1rem;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: linear-gradient(180deg, #ffffff, #f8fbff);
             }
 
             .stat-value {
+                color: var(--ink);
                 font-size: 2rem;
-                font-weight: 700;
+                font-weight: 900;
+                line-height: 1;
             }
 
             .stat-label {
-                color: #c8d1dc;
+                margin-top: 0.35rem;
+                color: var(--muted);
+                font-weight: 700;
+            }
+
+            .feature-card,
+            .compare-card,
+            .cta-card {
+                height: 100%;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow);
             }
 
             .feature-card {
-                height: 100%;
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 8px;
-                padding: 1.25rem;
+                padding: 1.2rem;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
             }
 
-            .feature-card p,
-            .result-empty,
-            .college-meta {
+            .feature-card:hover {
+                transform: translateY(-2px);
+                border-color: rgba(36, 87, 245, 0.22);
+                box-shadow: var(--shadow-hover);
+            }
+
+            .feature-icon {
+                width: 44px;
+                height: 44px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: var(--radius);
+                background: rgba(36, 87, 245, 0.12);
+                color: var(--primary);
+                font-weight: 900;
+            }
+
+            .feature-copy {
+                color: var(--muted);
+                line-height: 1.65;
+            }
+
+            .compare-card {
+                overflow: hidden;
+            }
+
+            .compare-head {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                border-bottom: 1px solid var(--line);
+            }
+
+            .compare-head > div {
+                padding: 1rem 1.15rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                font-size: 0.75rem;
+            }
+
+            .compare-head .pdf {
+                background: #f8fafc;
                 color: var(--muted);
             }
 
-            .badge-soft {
-                color: #0d5f4d;
-                background: #e0f5ef;
-                border: 1px solid #b8e5d7;
+            .compare-head .product {
+                background: rgba(36, 87, 245, 0.06);
+                color: var(--primary-strong);
+            }
+
+            .compare-row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1rem;
+                padding: 1rem 1.15rem;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .compare-row:last-child {
+                border-bottom: 0;
+            }
+
+            .compare-row .left,
+            .compare-row .right {
+                display: flex;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+
+            .compare-row .dot {
+                width: 26px;
+                height: 26px;
+                flex: 0 0 26px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: 999px;
+                font-weight: 900;
+            }
+
+            .compare-row .dot.pdf {
+                background: rgba(220, 38, 38, 0.12);
+                color: var(--danger);
+            }
+
+            .compare-row .dot.product {
+                background: rgba(5, 150, 105, 0.12);
+                color: var(--success);
+            }
+
+            .compare-row p {
+                margin: 0;
+                color: var(--muted);
+                line-height: 1.6;
+            }
+
+            .compare-row strong {
+                display: block;
+                margin-bottom: 0.2rem;
+                color: var(--ink);
+            }
+
+            .cta-band {
+                background:
+                    radial-gradient(circle at top right, rgba(36, 87, 245, 0.08), transparent 28%),
+                    #ffffff;
+                border-top: 1px solid rgba(219, 228, 240, 0.9);
+            }
+
+            .cta-card {
+                padding: 2rem;
             }
 
             .footer {
-                color: var(--muted);
-                border-top: 1px solid var(--line);
+                border-top: 1px solid rgba(219, 228, 240, 0.9);
                 background: #ffffff;
+                color: var(--muted);
+                font-size: 0.95rem;
+            }
+
+            @media (max-width: 991px) {
+                .hero-title {
+                    max-width: none;
+                }
+
+                .preview-metric-grid,
+                .compare-head,
+                .compare-row {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 767px) {
+                .site-nav .container {
+                    flex-direction: column;
+                    align-items: stretch !important;
+                }
+
+                .college-search {
+                    max-width: none;
+                }
+
+                .hero-shell {
+                    padding-top: 3.25rem;
+                    padding-bottom: 2.5rem;
+                }
+
+                .hero-actions .btn {
+                    width: 100%;
+                }
+
+                .preview-top {
+                    align-items: flex-start;
+                    flex-direction: column;
+                }
             }
         </style>
     </head>
     <body>
-        <nav class="navbar py-3">
+        <nav class="site-nav py-3">
             <div class="container d-flex align-items-center justify-content-between gap-3">
-                <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
-                    <span class="brand-name">MyCollege<span>List</span></span>
-                </a>
+                <a class="brand-name" href="/">MyCollege<span>List</span></a>
+
+                <form class="college-search d-flex flex-grow-1 flex-md-grow-0" method="get" action="/college_search" role="search">
+                    <input class="form-control college-search-input" type="search" name="q" placeholder="Search college name or code" aria-label="Search college name or code" autocomplete="off" required>
+                    <button class="btn btn-primary ms-2" type="submit">Search</button>
+                    <div class="college-suggestions"></div>
+                </form>
+
+                <a class="btn btn-outline-primary" href="/search/">Rank Search</a>
             </div>
         </nav>
 
         <main>
-            <section class="hero py-5">
-                <div class="container py-lg-4">
-                    <div class="row g-4 align-items-center">
+            <section class="hero-shell">
+                <div class="container">
+                    <div class="row align-items-center g-4">
                         <div class="col-lg-7">
-                            <span class="badge rounded-pill badge-soft px-3 py-2 mb-3">TS EAPCET counselling helper</span>
-                            <h1 class="fw-bold mb-3">Find Telangana engineering colleges that match your TS EAPCET rank.</h1>
-                            <p class="mb-4">Search colleges by branch, caste category, gender, and rank range. Compare cutoff ranks and make a smarter shortlist before web options.</p>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a class="btn btn-primary btn-lg" href="/search/">Start College Search</a>
-                                <a class="btn btn-light btn-lg border" href="#how-it-helps">How It Helps</a>
+                            <span class="hero-eyebrow mb-3">TG EAPCET college predictor</span>
+                            <h1 class="hero-title fw-bold mb-3">Choose colleges with confidence, not guesswork.</h1>
+                            <p class="hero-copy mb-4">MyCollegeList helps TS EAPCET students search colleges by code or name, compare rank cutoffs across categories and phases, and build a shortlist that feels realistic before web options.</p>
+
+                            <div class="hero-actions d-flex flex-wrap gap-2 mb-4">
+                                <a class="btn btn-primary btn-lg px-4" href="/search/">Start Rank Search</a>
+                                <a class="btn btn-outline-primary btn-lg px-4" href="#why-it-works">See why it helps</a>
+                            </div>
+
+                            <div class="hero-badges">
+                                <span class="mini-pill">Official counselling cutoff data</span>
+                                <span class="mini-pill">Search by college code</span>
+                                <span class="mini-pill">Phase 1, Phase 2, Last Rank</span>
                             </div>
                         </div>
+
                         <div class="col-lg-5">
-                            <div class="hero-panel p-4">
-                                <div class="section-title mb-2">What you can check</div>
-                                <h2 class="h3 fw-bold">Rank-based TS EAPCET college suggestions.</h2>
-                                <p class="result-empty mb-4">Enter your expected rank range and category to see matching colleges, courses, and last-rank cutoffs from the project database.</p>
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <div class="feature-card">
-                                            <div class="stat-value text-primary">01</div>
-                                            <div class="college-meta">Filter by branch</div>
-                                        </div>
+                            <div class="hero-preview">
+                                <div class="preview-top">
+                                    <div>
+                                        <div class="section-label mb-1">At a glance</div>
+                                        <h2 class="h4 fw-bold mb-0">What students compare here</h2>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="feature-card">
-                                            <div class="stat-value text-success">02</div>
-                                            <div class="college-meta">Check category ranks</div>
-                                        </div>
+                                    <span class="nav-pill">Live shortlist</span>
+                                </div>
+
+                                <div class="preview-metric-grid">
+                                    <div class="preview-metric">
+                                        <div class="preview-value">150+</div>
+                                        <div class="preview-label">Colleges indexed</div>
                                     </div>
+                                    <div class="preview-metric">
+                                        <div class="preview-value">45+</div>
+                                        <div class="preview-label">Branches covered</div>
+                                    </div>
+                                    <div class="preview-metric">
+                                        <div class="preview-value">9</div>
+                                        <div class="preview-label">Category columns</div>
+                                    </div>
+                                </div>
+
+                                <ul class="preview-list mb-0">
+                                    <li>
+                                        <span class="preview-bullet">1</span>
+                                        <div>
+                                            <strong class="d-block mb-1">Rank-range matching</strong>
+                                            <span class="text-secondary">Filter colleges by the rank window that matters to you.</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span class="preview-bullet">2</span>
+                                        <div>
+                                            <strong class="d-block mb-1">Category and gender cutoffs</strong>
+                                            <span class="text-secondary">Compare OC, BC, EWS, SC, and ST ranks in one view.</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span class="preview-bullet">3</span>
+                                        <div>
+                                            <strong class="d-block mb-1">Branch-level exploration</strong>
+                                            <span class="text-secondary">Open a college page to inspect every branch cutoff.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stat-strip">
+                <div class="container">
+                    <div class="stat-panel">
+                        <div class="row g-3 text-center">
+                            <div class="col-md-4">
+                                <div class="stat-card h-100">
+                                    <div class="stat-value">150+</div>
+                                    <div class="stat-label">Colleges available for shortlisting</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card h-100">
+                                    <div class="stat-value">45+</div>
+                                    <div class="stat-label">Branch codes students actually search</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card h-100">
+                                    <div class="stat-value">9</div>
+                                    <div class="stat-label">Category and gender cutoffs supported</div>
                                 </div>
                             </div>
                         </div>
@@ -169,85 +667,125 @@
                 </div>
             </section>
 
-            <section class="stat-band py-4">
+            <section class="py-5" id="why-it-works">
                 <div class="container">
-                    <div class="row g-4 text-center text-md-start">
-                        <div class="col-md-4">
-                            <div class="stat-value">150+</div>
-                            <div class="stat-label">Colleges available</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-value">45+</div>
-                            <div class="stat-label">Engineering branch codes supported</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-value">9</div>
-                            <div class="stat-label">OC, BC, SC, ST, and EWS categories</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="py-5" id="how-it-helps">
-                <div class="container">
-                    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
-                        <div>
-                            <div class="section-title mb-2">How it helps</div>
-                            <h2 class="h1 fw-bold mb-0">Plan your TS EAPCET web options with clarity</h2>
-                        </div>
-                        <p class="mb-0 result-empty">Use the search results as a starting point, then verify important details with official counselling sources before final submission.</p>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <article class="feature-card">
-                                <span class="badge text-bg-primary mb-3">Rank match</span>
-                                <h3 class="h5 fw-bold">Search by your rank range</h3>
-                                <p>Enter lower and upper TS EAPCET ranks to find colleges where your rank may fit based on available cutoff data.</p>
-                                <div class="college-meta">Useful for safe, target, and ambitious choices</div>
-                            </article>
-                        </div>
-                        <div class="col-md-4">
-                            <article class="feature-card">
-                                <span class="badge text-bg-success mb-3">Category filter</span>
-                                <h3 class="h5 fw-bold">Compare reservation cutoffs</h3>
-                                <p>Check results for OC, BC_A, BC_B, BC_C, BC_D, BC_E, SC, ST, and EWS categories with boys/girls rank data.</p>
-                                <div class="college-meta">Designed around counselling rank columns</div>
-                            </article>
-                        </div>
-                        <div class="col-md-4">
-                            <article class="feature-card">
-                                <span class="badge text-bg-warning mb-3">Branch view</span>
-                                <h3 class="h5 fw-bold">Review courses college-wise</h3>
-                                <p>Open a college page to see its branches, fee information, institute profile, and expandable cutoff rank tables.</p>
-                                <div class="college-meta">Helpful for final preference ordering</div>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="pb-5" id="about">
-                <div class="container">
-                    <div class="row g-3">
+                    <div class="row align-items-end g-3 mb-4">
                         <div class="col-lg-7">
-                            <div class="feature-card">
-                                <div class="section-title mb-2">About the project</div>
-                                <h2 class="h3 fw-bold">Built for TS EAPCET college selection</h2>
-                                <p class="result-empty mb-0">This project helps students explore Telangana engineering colleges using rank, branch, category, and gender-based cutoff data. It is meant to support shortlisting and comparison before filling web options.</p>
-                            </div>
+                            <div class="section-label mb-2">Why it feels faster</div>
+                            <h2 class="section-title fw-bold mb-0">Built for students who need a clean shortlist, not a long PDF hunt.</h2>
                         </div>
                         <div class="col-lg-5">
-                            <div class="feature-card">
-                                <div class="section-title mb-2">Counselling checklist</div>
-                                <h2 class="h3 fw-bold">Before final web options</h2>
-                                <ul class="mb-0">
-                                    <li>Verify college and branch details on the official TS EAPCET counselling website.</li>
-                                    <li>Compare cutoff ranks across your category and gender.</li>
-                                    <li>Check tuition fee, location, hostel, transport, and affiliation.</li>
-                                    <li>Keep a balanced list of safe, target, and ambitious colleges.</li>
-                                </ul>
+                            <p class="section-copy mb-0">The interface keeps the important stuff visible: search, rank range, category, phase, and branch options. That makes it easier to compare colleges quickly and move on with confidence.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <article class="feature-card">
+                                <div class="feature-icon mb-3">01</div>
+                                <h3 class="h5 fw-bold">Search by college name or code</h3>
+                                <p class="feature-copy mb-0">Use the global search bar to jump directly to a college page without browsing the whole database.</p>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="feature-card">
+                                <div class="feature-icon mb-3" style="background: rgba(5, 150, 105, 0.12); color: var(--success);">02</div>
+                                <h3 class="h5 fw-bold">Compare realistic cutoffs</h3>
+                                <p class="feature-copy mb-0">Rank matching, category cutoffs, and phase-specific data help students narrow choices quickly.</p>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="feature-card">
+                                <div class="feature-icon mb-3" style="background: rgba(217, 119, 6, 0.12); color: var(--warning);">03</div>
+                                <h3 class="h5 fw-bold">Plan a better preference order</h3>
+                                <p class="feature-copy mb-0">Review branches, fees, and college details in one flow before finalizing web options.</p>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-5" id="compare">
+                <div class="container">
+                    <div class="row align-items-end g-3 mb-4">
+                        <div class="col-lg-7">
+                            <div class="section-label mb-2">Product value</div>
+                            <h2 class="section-title fw-bold mb-0">Traditional PDF vs MyCollegeList</h2>
+                        </div>
+                        <div class="col-lg-5">
+                            <p class="section-copy mb-0">The same cutoff data becomes much more useful when it is searchable, filterable, and readable on a phone.</p>
+                        </div>
+                    </div>
+
+                    <div class="compare-card">
+                        <div class="compare-head">
+                            <div class="pdf">Traditional PDF</div>
+                            <div class="product">MyCollegeList</div>
+                        </div>
+
+                        <div class="compare-row">
+                            <div class="left">
+                                <span class="dot pdf">x</span>
+                                <div>
+                                    <strong>Long document scanning</strong>
+                                    <p>Students scroll through dozens of pages to find a single branch cutoff.</p>
+                                </div>
                             </div>
+                            <div class="right">
+                                <span class="dot product">+</span>
+                                <div>
+                                    <strong>Instant search and filtering</strong>
+                                    <p>Search a college, filter by branch, and get the useful result immediately.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="compare-row">
+                            <div class="left">
+                                <span class="dot pdf">x</span>
+                                <div>
+                                    <strong>Hard to compare categories</strong>
+                                    <p>OC, BC, EWS, SC, ST, boys, and girls ranks are scattered across the file.</p>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <span class="dot product">+</span>
+                                <div>
+                                    <strong>Clear category-aware view</strong>
+                                    <p>Category and gender cutoffs stay easy to scan on the same college page.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="compare-row">
+                            <div class="left">
+                                <span class="dot pdf">x</span>
+                                <div>
+                                    <strong>Little decision support</strong>
+                                    <p>PDFs show data, but not much help with ranking a safe, target, and dream list.</p>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <span class="dot product">+</span>
+                                <div>
+                                    <strong>Better shortlisting decisions</strong>
+                                    <p>MyCollegeList highlights relevant cutoffs, branch details, and college profiles.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta-band py-5">
+                <div class="container">
+                    <div class="cta-card text-center">
+                        <div class="section-label mb-2">Ready to compare</div>
+                        <h2 class="section-title fw-bold mb-3">Start with your rank and build a cleaner shortlist.</h2>
+                        <p class="section-copy mx-auto mb-4" style="max-width: 720px;">Search colleges, compare branches, and review cutoff ranks in one place before you finalize your TS EAPCET web options.</p>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a class="btn btn-primary btn-lg px-4" href="/search/">Start Rank Search</a>
+                            <a class="btn btn-outline-primary btn-lg px-4" href="#compare">View comparison</a>
                         </div>
                     </div>
                 </div>
@@ -256,9 +794,55 @@
 
         <footer class="footer py-4">
             <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
-                <span>MyCollegeList</span>
-                <span>Use this project as a guide and verify final details officially</span>
+                <span class="fw-semibold">MyCollegeList</span>
+                <span>TG EAPCET counselling helper. Always verify final details with official sources.</span>
             </div>
         </footer>
+
+        <script>
+            document.querySelectorAll(".college-search").forEach((form) => {
+                const input = form.querySelector(".college-search-input");
+                const menu = form.querySelector(".college-suggestions");
+                let controller;
+
+                function hideSuggestions() {
+                    menu.classList.remove("show");
+                    menu.innerHTML = "";
+                }
+
+                input.addEventListener("input", async () => {
+                    const query = input.value.trim();
+                    if (controller) controller.abort();
+                    if (query.length < 2) {
+                        hideSuggestions();
+                        return;
+                    }
+
+                    controller = new AbortController();
+                    const response = await fetch(`/college_suggestions?q=${encodeURIComponent(query)}`, {
+                        signal: controller.signal
+                    }).catch(() => null);
+                    if (!response) return;
+
+                    const data = await response.json();
+                    menu.innerHTML = "";
+                    data.results.forEach((college) => {
+                        const item = document.createElement("button");
+                        item.type = "button";
+                        item.className = "suggestion-item";
+                        item.innerHTML = `<div class="suggestion-code">${college.inst_code}</div><div class="suggestion-name">${college.inst_name}</div>`;
+                        item.addEventListener("click", () => {
+                            window.location.href = college.url;
+                        });
+                        menu.appendChild(item);
+                    });
+                    menu.classList.toggle("show", data.results.length > 0);
+                });
+
+                document.addEventListener("click", (event) => {
+                    if (!form.contains(event.target)) hideSuggestions();
+                });
+            });
+        </script>
     </body>
 </html>

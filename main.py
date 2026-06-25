@@ -4,6 +4,8 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
+from rapidfuzz import fuzz, process
 import os
 
 app = FastAPI()
@@ -128,6 +130,64 @@ def get_session():
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
+
+def college_suggestion_items(session: Session, search_text: str, limit: int = 6):
+    normalized_search = search_text.strip()
+    if not normalized_search:
+        return []
+
+    colleges = session.exec(select(Colleges)).all()
+    choices = {
+        f"{college.inst_code or ''} {college.inst_name or ''}".strip(): college
+        for college in colleges
+    }
+
+    direct_matches = [
+        college for college in colleges
+        if normalized_search.casefold() in (college.inst_code or "").casefold()
+        or normalized_search.casefold() in (college.inst_name or "").casefold()
+    ]
+    fuzzy_matches = [
+        choices[match_text]
+        for match_text, score, _ in process.extract(
+            normalized_search,
+            choices.keys(),
+            scorer=fuzz.WRatio,
+            limit=limit * 3
+        )
+        if score >= 55
+    ]
+
+    suggestions = []
+    seen_codes = set()
+    for college in direct_matches + fuzzy_matches:
+        if not college.inst_code or college.inst_code in seen_codes:
+            continue
+        seen_codes.add(college.inst_code)
+        suggestions.append({
+            "inst_code": college.inst_code,
+            "inst_name": college.inst_name,
+            "url": f"/colleges/{college.inst_code}"
+        })
+        if len(suggestions) == limit:
+            break
+    return suggestions
+
+@app.get("/college_suggestions")
+def college_suggestions(session: SessionDep, q: str = Query("")):
+    return {"results": college_suggestion_items(session, q)}
+
+@app.get("/college_search")
+def college_search(session: SessionDep, q: str = Query("")):
+    search_text = q.strip()
+    if not search_text:
+        return RedirectResponse(url="/", status_code=303)
+
+    suggestions = college_suggestion_items(session, search_text, limit=1)
+    if suggestions:
+        return RedirectResponse(url=suggestions[0]["url"], status_code=303)
+
+    return RedirectResponse(url="/search/", status_code=303)
 
 class CollegeFilter(BaseModel):
     #colleges table

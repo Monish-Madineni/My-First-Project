@@ -1,115 +1,272 @@
+{% set college = results[0][0] if results else none %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% if results %}{{results[0][0].inst_name}} | mycollegelist.xyz{% else %}mycollegelist.xyz{% endif %}</title>
+        <title>{% if college %}{{ college.inst_name }} | MyCollegeList{% else %}MyCollegeList{% endif %}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <style>
             :root {
-                --ink: #17212b;
-                --muted: #65748a;
-                --line: #d9e2ec;
-                --page: #f4f7fb;
+                --ink: #0f172a;
+                --muted: #64748b;
+                --line: #dbe4f0;
+                --page: #f8fafc;
                 --surface: #ffffff;
-                --primary: #2563eb;
-                --green: #0f8a68;
+                --surface-soft: #f3f7ff;
+                --primary: #2457f5;
+                --primary-strong: #183fc3;
+                --success: #059669;
+                --warning: #d97706;
+                --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+                --shadow-hover: 0 22px 60px rgba(15, 23, 42, 0.12);
+                --radius: 8px;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
             }
 
             body {
                 min-height: 100vh;
                 margin: 0;
                 color: var(--ink);
-                background: var(--page);
-                font-family: Arial, Helvetica, sans-serif;
+                background:
+                    radial-gradient(circle at top left, rgba(36, 87, 245, 0.08), transparent 28%),
+                    radial-gradient(circle at top right, rgba(5, 150, 105, 0.06), transparent 24%),
+                    var(--page);
+                font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .brand-name {
+                font-family: "Space Grotesk", "Inter", sans-serif;
+                letter-spacing: 0;
             }
 
             .topbar {
-                background: var(--surface);
-                border-bottom: 1px solid var(--line);
+                position: sticky;
+                top: 0;
+                z-index: 40;
+                background: rgba(255, 255, 255, 0.92);
+                border-bottom: 1px solid rgba(219, 228, 240, 0.92);
+                backdrop-filter: blur(14px);
             }
 
             .brand-name {
                 color: var(--ink);
                 font-size: 1.35rem;
-                font-weight: 900;
-                letter-spacing: 0;
+                font-weight: 800;
+                text-decoration: none;
             }
 
             .brand-name span {
                 color: var(--primary);
             }
 
-            .hero {
-                background: linear-gradient(135deg, #eaf2ff 0%, #f8fbff 58%, #ffffff 100%);
-                border-bottom: 1px solid var(--line);
+            .college-search {
+                position: relative;
+                max-width: 430px;
+                width: 100%;
             }
 
-            .college-code {
-                display: inline-flex;
-                align-items: center;
-                padding: 0.4rem 0.75rem;
-                border-radius: 999px;
-                color: #174c39;
-                background: #e4f7ef;
+            .college-search .form-control,
+            .btn,
+            .form-control {
+                min-height: 44px;
+                border-radius: var(--radius);
+            }
+
+            .college-search .form-control,
+            .form-control {
+                border-color: var(--line);
+                box-shadow: none;
+            }
+
+            .college-search .form-control:focus,
+            .form-control:focus {
+                border-color: rgba(36, 87, 245, 0.45);
+                box-shadow: 0 0 0 0.2rem rgba(36, 87, 245, 0.08);
+            }
+
+            .college-suggestions {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                right: 0;
+                z-index: 50;
+                display: none;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow-hover);
+            }
+
+            .college-suggestions.show {
+                display: block;
+            }
+
+            .suggestion-item {
+                width: 100%;
+                padding: 0.85rem 0.95rem;
+                border: 0;
+                border-bottom: 1px solid var(--line);
+                background: #ffffff;
+                text-align: left;
+                transition: background 0.15s ease;
+            }
+
+            .suggestion-item:last-child {
+                border-bottom: 0;
+            }
+
+            .suggestion-item:hover {
+                background: #f6f9ff;
+            }
+
+            .suggestion-code {
+                color: var(--primary);
                 font-weight: 800;
+            }
+
+            .suggestion-name {
+                color: var(--muted);
+                font-size: 0.92rem;
+            }
+
+            .profile-hero {
+                border-bottom: 1px solid rgba(219, 228, 240, 0.9);
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 247, 255, 0.96));
+            }
+
+            .section-label {
+                color: var(--primary);
+                font-size: 0.8rem;
+                font-weight: 900;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
             }
 
             .college-name {
                 max-width: 980px;
-                font-size: clamp(2rem, 4vw, 4rem);
-                line-height: 1.05;
-                letter-spacing: 0;
+                margin: 0;
+                font-size: clamp(2rem, 4vw, 3.3rem);
+                line-height: 1.02;
+                letter-spacing: -0.03em;
             }
 
             .muted-text {
                 color: var(--muted);
             }
 
-            .info-card,
-            .branch-card {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 8px;
-                box-shadow: 0 16px 40px rgba(23, 33, 43, 0.06);
+            .profile-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.55rem;
+                margin-top: 1rem;
             }
 
-            .section-label {
+            .profile-chip,
+            .meta-chip,
+            .fee-pill,
+            .college-code {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.42rem 0.72rem;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                background: #ffffff;
                 color: var(--muted);
-                font-size: 0.84rem;
+                font-size: 0.88rem;
+                font-weight: 700;
+            }
+
+            .college-code {
+                border-color: rgba(36, 87, 245, 0.18);
+                background: rgba(36, 87, 245, 0.08);
+                color: var(--primary-strong);
                 font-weight: 800;
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
+            }
+
+            .info-card,
+            .branch-card,
+            .sidebar-card,
+            .empty-state {
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                box-shadow: var(--shadow);
+            }
+
+            .info-card {
+                height: 100%;
+                padding: 1rem;
+                background: linear-gradient(180deg, #ffffff, #f9fbff);
             }
 
             .stat-value {
-                font-size: 2rem;
-                font-weight: 800;
+                color: var(--ink);
+                font-size: 1.4rem;
+                font-weight: 900;
+                line-height: 1.1;
             }
 
-            .branch-code {
-                width: 56px;
-                min-width: 56px;
-                height: 44px;
-                display: inline-grid;
-                place-items: center;
-                border-radius: 8px;
-                color: #ffffff;
-                background: var(--primary);
-                font-weight: 800;
+            .stat-copy {
+                margin-top: 0.35rem;
+                color: var(--muted);
+                font-size: 0.92rem;
             }
 
             .branch-card {
-                transition: transform 0.15s ease, box-shadow 0.15s ease;
+                padding: 1rem;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
             }
 
             .branch-card:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 18px 44px rgba(23, 33, 43, 0.1);
+                border-color: rgba(36, 87, 245, 0.22);
+                box-shadow: var(--shadow-hover);
             }
 
-            .note-list li {
-                margin-bottom: 0.65rem;
+            .branch-code {
+                width: 58px;
+                min-width: 58px;
+                height: 46px;
+                display: inline-grid;
+                place-items: center;
+                border-radius: var(--radius);
+                background: rgba(36, 87, 245, 0.12);
+                color: var(--primary);
+                font-weight: 900;
+            }
+
+            .branch-title {
+                color: var(--ink);
+            }
+
+            .branch-subcopy {
+                color: var(--muted);
+                line-height: 1.65;
+            }
+
+            .fee-pill {
+                border-color: rgba(5, 150, 105, 0.18);
+                background: rgba(5, 150, 105, 0.09);
+                color: var(--success);
+                font-weight: 900;
             }
 
             .rank-details {
@@ -119,13 +276,13 @@
             .rank-details summary {
                 display: inline-flex;
                 align-items: center;
-                gap: 0.5rem;
-                padding: 0.55rem 0.9rem;
-                border: 1px solid var(--primary);
-                border-radius: 8px;
+                gap: 0.45rem;
+                padding: 0.6rem 0.9rem;
+                border: 1px solid rgba(36, 87, 245, 0.22);
+                border-radius: var(--radius);
                 color: var(--primary);
                 background: #ffffff;
-                font-weight: 800;
+                font-weight: 900;
                 cursor: pointer;
                 list-style: none;
             }
@@ -136,7 +293,7 @@
 
             .rank-details summary::after {
                 content: "+";
-                font-size: 1.1rem;
+                font-size: 1.05rem;
                 line-height: 1;
             }
 
@@ -144,35 +301,129 @@
                 content: "-";
             }
 
+            .rank-table {
+                overflow: hidden;
+                border-radius: var(--radius);
+            }
+
             .rank-table th {
                 color: var(--muted);
-                font-size: 0.8rem;
+                background: #f8fafc;
+                font-size: 0.78rem;
                 text-transform: uppercase;
             }
 
             .rank-table td {
-                font-weight: 700;
+                font-weight: 800;
+            }
+
+            .note-list li {
+                margin-bottom: 0.7rem;
+            }
+
+            .sidebar-card {
+                position: sticky;
+                top: 92px;
+                padding: 1.2rem;
+            }
+
+            .empty-state {
+                padding: 2rem;
+                text-align: center;
+            }
+
+            .related-card {
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow);
+            }
+
+            .footer {
+                color: var(--muted);
+                border-top: 1px solid rgba(219, 228, 240, 0.9);
+                background: #ffffff;
+            }
+
+            @media (max-width: 991px) {
+                .sidebar-card {
+                    position: static;
+                }
+            }
+
+            @media (max-width: 767px) {
+                .topbar .container {
+                    align-items: stretch !important;
+                    flex-direction: column;
+                }
+
+                .topbar .d-flex.gap-2 {
+                    align-items: stretch;
+                    flex-direction: column;
+                }
+
+                .college-search {
+                    max-width: none;
+                }
+
+                .college-name {
+                    font-size: clamp(1.9rem, 7vw, 2.6rem);
+                }
             }
         </style>
     </head>
     <body>
         <nav class="topbar py-3">
-            <div class="container d-flex align-items-center justify-content-between gap-3">
-                <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
-                    <span class="brand-name">MyCollege<span>List</span></span>
-                </a>
-                <div class="d-flex gap-2">
+            <div class="container d-flex align-items-center justify-content-between">
+
+                <!-- Logo -->
+                <a class="brand-name" href="/">MyCollege<span>List</span></a>
+
+                <!-- Search -->
+                <form class="college-search d-flex" method="get" action="/college_search" role="search">
+                    <input
+                        class="form-control college-search-input"
+                        type="search"
+                        name="q"
+                        placeholder="Search college name or code"
+                        autocomplete="off"
+                        required
+                    >
+                    <button class="btn btn-primary ms-2" type="submit">
+                        Search
+                    </button>
+
+                    <div class="college-suggestions"></div>
+                </form>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex align-items-center gap-2">
                     <a class="btn btn-outline-primary" href="/">Home</a>
+                    <a class="btn btn-primary" href="/search/">Rank Search</a>
                 </div>
+
             </div>
         </nav>
 
-        <header class="hero py-5">
-            <div class="container">
-                {% if results %}
-                    <span class="college-code mb-3">{{results[0][0].inst_code}}</span>
-                    <h1 class="college-name fw-bold mb-3">{{results[0][0].inst_name}}</h1>
-                    <p class="lead muted-text mb-0">Review the available branches for this college and use the checklist below before adding it to your counselling preference order.</p>
+        <header class="profile-hero py-4 py-lg-5">
+            <div class="container py-lg-2">
+                {% if college %}
+                    <span class="college-code mb-3">{{ college.inst_code }}</span>
+                    <h1 class="college-name fw-bold mb-3">{{ college.inst_name }}</h1>
+                    <p class="lead muted-text mb-0">Compact profile view for TS EAPCET students. Review branch cutoffs, fee details, and college information before adding this college to your preference list.</p>
+
+                    <div class="profile-meta">
+                        <span class="profile-chip">Location <strong>{{ college.place }}</strong></span>
+                        <span class="profile-chip">Type <strong>{{ college.type }}</strong></span>
+                        <span class="profile-chip">Affiliation <strong>{{ college.affiliation }}</strong></span>
+                        <span class="profile-chip">Established <strong>{{ college.estab }}</strong></span>
+                        <span class="profile-chip">Branches <strong>{{ results|length }}</strong></span>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a class="btn btn-primary btn-lg" href="/search/">Back to rank search</a>
+                        <a class="btn btn-outline-primary btn-lg" href="#branches">View branches</a>
+                    </div>
                 {% else %}
                     <span class="college-code mb-3">No Data</span>
                     <h1 class="college-name fw-bold mb-3">College details unavailable</h1>
@@ -181,166 +432,248 @@
             </div>
         </header>
 
-        <main class="container py-5">
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
-                        <div class="section-label mb-2">Institute code</div>
-                        <div class="stat-value">{% if results %}{{results[0][0].inst_code}}{% else %}-{% endif %}</div>
+        <main class="container py-4 py-lg-5">
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
+                        <div class="section-label mb-2">College code</div>
+                        <div class="stat-value">{% if college %}{{ college.inst_code }}{% else %}-{% endif %}</div>
+                        <div class="stat-copy">Institute identifier</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
                         <div class="section-label mb-2">Location</div>
-                        <div class="h4 fw-bold mb-1">{% if results %}{{results[0][0].place}}{% else %}-{% endif %}</div>
-                        <p class="muted-text mb-0">{% if results %}District: {{results[0][0].dist_code}}{% else %}No district data{% endif %}</p>
+                        <div class="stat-value">{% if college %}{{ college.place }}{% else %}-{% endif %}</div>
+                        <div class="stat-copy">{% if college %}District {{ college.dist_code }}{% else %}No district data{% endif %}</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
-                        <div class="section-label mb-2">College profile</div>
-                        <div class="h4 fw-bold mb-1">{% if results %}{{results[0][0].type}} | {{results[0][0].coed}}{% else %}-{% endif %}</div>
-                        <p class="muted-text mb-0">{% if results %}Affiliation: {{results[0][0].affiliation}} | Est. {{results[0][0].estab}}{% else %}No profile data{% endif %}</p>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
+                        <div class="section-label mb-2">Type</div>
+                        <div class="stat-value">{% if college %}{{ college.type }}{% else %}-{% endif %}</div>
+                        <div class="stat-copy">{% if college %}Campus format: {{ college.coed }}{% else %}No profile data{% endif %}</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
-                        <div class="section-label mb-2">Available branches</div>
-                        <div class="stat-value">{{results|length}}</div>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
+                        <div class="section-label mb-2">Affiliation</div>
+                        <div class="stat-value">{% if college %}{{ college.affiliation }}{% else %}-{% endif %}</div>
+                        <div class="stat-copy">University oversight</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
-                        <div class="section-label mb-2">Tuition fee</div>
-                        <div class="h4 fw-bold mb-1">{% if results %}Rs. {{results[0][1].fee}}{% else %}-{% endif %}</div>
-                        <p class="muted-text mb-0">Verify final fee from official counselling sources.</p>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
+                        <div class="section-label mb-2">Established</div>
+                        <div class="stat-value">{% if college %}{{ college.estab }}{% else %}-{% endif %}</div>
+                        <div class="stat-copy">Founding year</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="info-card p-4 h-100">
-                        <div class="section-label mb-2">Student action</div>
-                        <div class="h5 fw-bold mb-1">Compare before choosing</div>
-                        <p class="muted-text mb-0">Check cutoff, fees, travel, hostel, and placements.</p>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="info-card">
+                        <div class="section-label mb-2">Branches</div>
+                        <div class="stat-value">{{ results|length }}</div>
+                        <div class="stat-copy">Cutoff blocks available</div>
                     </div>
                 </div>
             </div>
 
             <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
+                <div class="col-lg-8" id="branches">
+                    <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-3">
                         <div>
                             <div class="section-label mb-2">Courses offered</div>
-                            <h2 class="fw-bold mb-0">Branch list</h2>
+                            <h2 class="fw-bold mb-0">Branch cutoff dashboard</h2>
+                            <p class="muted-text mt-2 mb-0">Open each branch to review the full category table and compare safe, target, and dream options.</p>
                         </div>
+                        <div class="text-md-end text-muted fw-bold">{{ results|length }} branches</div>
                     </div>
 
-                    <div class="d-grid gap-3">
-                        {% for college, course in results %}
-                            <article class="branch-card p-3">
-                                <div class="d-flex flex-column flex-xl-row gap-3 align-items-start">
-                                    <span class="branch-code">{{course.branch_code}}</span>
-                                    <div class="w-100">
-                                        <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
-                                            <div>
-                                                <h3 class="h5 fw-bold mb-1">{{course.branch_name}}</h3>
-                                                <div class="muted-text">Branch code: {{course.branch_code}}</div>
+                    {% if results %}
+                        <div class="d-grid gap-3">
+                            {% for college_item, course in results %}
+                                <article class="branch-card">
+                                    <div class="d-flex flex-column flex-xl-row gap-3 align-items-start">
+                                        <span class="branch-code">{{ course.branch_code }}</span>
+                                        <div class="w-100">
+                                            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                                                <div>
+                                                    <h3 class="h5 fw-bold mb-1 branch-title">{{ course.branch_name }}</h3>
+                                                    <div class="branch-subcopy">Branch code: {{ course.branch_code }}</div>
+                                                </div>
+                                                <div class="text-md-end">
+                                                    <div class="section-label mb-1">Fee</div>
+                                                    <span class="fee-pill">Rs. {{ course.fee }}</span>
+                                                </div>
                                             </div>
-                                            <div class="text-md-end">
-                                                <div class="section-label">Fee</div>
-                                                <div class="fw-bold">Rs. {{course.fee}}</div>
+
+                                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                                <span class="meta-chip">College <strong>{{ college_item.inst_code }}</strong></span>
+                                                <span class="meta-chip">Cutoff table available</span>
                                             </div>
+
+                                            <details class="rank-details mt-3 pt-3">
+                                                <summary>View all Laste Ranks by Category</summary>
+                                                <div class="table-responsive mt-3">
+                                                    <table class="table table-sm table-bordered align-middle mb-0 rank-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Category</th>
+                                                                <th>Boys</th>
+                                                                <th>Girls</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>OC</td>
+                                                                <td>{{ course.ocb }}</td>
+                                                                <td>{{ course.ocg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>BC_A</td>
+                                                                <td>{{ course.bc_ab }}</td>
+                                                                <td>{{ course.bc_ag }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>BC_B</td>
+                                                                <td>{{ course.bc_bb }}</td>
+                                                                <td>{{ course.bc_bg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>BC_C</td>
+                                                                <td>{{ course.bc_cb }}</td>
+                                                                <td>{{ course.bc_cg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>BC_D</td>
+                                                                <td>{{ course.bc_db }}</td>
+                                                                <td>{{ course.bc_dg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>BC_E</td>
+                                                                <td>{{ course.bc_eb }}</td>
+                                                                <td>{{ course.bc_eg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>SC</td>
+                                                                <td>{{ course.scb }}</td>
+                                                                <td>{{ course.scg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>ST</td>
+                                                                <td>{{ course.stb }}</td>
+                                                                <td>{{ course.stg }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>EWS</td>
+                                                                <td>{{ course.ewsb }}</td>
+                                                                <td>{{ course.ewsg }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </details>
                                         </div>
-
-                                        <details class="rank-details mt-3 pt-3">
-                                            <summary>View all caste ranks</summary>
-                                            <div class="table-responsive mt-3">
-                                                <table class="table table-sm table-bordered align-middle mb-0 rank-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Category</th>
-                                                            <th>Boys</th>
-                                                            <th>Girls</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>OC</td>
-                                                            <td>{{course.ocb}}</td>
-                                                            <td>{{course.ocg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>BC_A</td>
-                                                            <td>{{course.bc_ab}}</td>
-                                                            <td>{{course.bc_ag}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>BC_B</td>
-                                                            <td>{{course.bc_bb}}</td>
-                                                            <td>{{course.bc_bg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>BC_C</td>
-                                                            <td>{{course.bc_cb}}</td>
-                                                            <td>{{course.bc_cg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>BC_D</td>
-                                                            <td>{{course.bc_db}}</td>
-                                                            <td>{{course.bc_dg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>BC_E</td>
-                                                            <td>{{course.bc_eb}}</td>
-                                                            <td>{{course.bc_eg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>SC</td>
-                                                            <td>{{course.scb}}</td>
-                                                            <td>{{course.scg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>ST</td>
-                                                            <td>{{course.stb}}</td>
-                                                            <td>{{course.stg}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>EWS</td>
-                                                            <td>{{course.ewsb}}</td>
-                                                            <td>{{course.ewsg}}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </details>
                                     </div>
-                                </div>
-                            </article>
-                        {% endfor %}
-                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="section-label mb-2">No branch data</div>
+                            <h3 class="h4 fw-bold">Try searching another college.</h3>
+                            <p class="muted-text mb-0">Use the search bar above to open a college by name or institute code.</p>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="info-card p-4 mb-4">
-                        <div class="section-label mb-2">Counselling checklist</div>
+                    <aside class="sidebar-card">
+                        <div class="section-label mb-2">Student checklist</div>
                         <h2 class="h4 fw-bold">Before selecting this college</h2>
-                        <ul class="note-list muted-text mb-0">
+                        <ul class="note-list muted-text mb-4">
                             <li>Compare this college with at least three similar options.</li>
-                            <li>Check previous round cutoffs for each branch.</li>
+                            <li>Check phase-wise cutoffs for each branch.</li>
                             <li>Confirm tuition fee, transport, hostel, and scholarship details.</li>
                             <li>Review placement records for the branches you prefer.</li>
                             <li>Verify all information with official counselling sources.</li>
                         </ul>
-                    </div>
-
-                    <div class="info-card p-4">
-                        <div class="section-label mb-2">Preference tip</div>
-                        <p class="muted-text mb-0">Place branches in the order you actually want to study them. A higher-ranked branch is not always better if it does not match your interests or career plan.</p>
-                    </div>
+                        <div class="border-top pt-4">
+                            <div class="section-label mb-2">Preference tip</div>
+                            <p class="muted-text mb-4">Place branches in the order you actually want to study them. A higher-ranked branch is not always better if it does not match your interests.</p>
+                            <a class="btn btn-primary w-100" href="/search/">Compare more colleges</a>
+                        </div>
+                    </aside>
                 </div>
             </div>
+
+            <section class="mt-5">
+                <div class="related-card p-4 p-md-5">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-lg-8">
+                            <div class="section-label mb-2">Related exploration</div>
+                            <h2 class="h3 fw-bold">Want similar colleges?</h2>
+                            <p class="muted-text mb-0">Use rank search to compare colleges with similar cutoffs, branches, categories, and counselling phase behavior.</p>
+                        </div>
+                        <div class="col-lg-4 text-lg-end">
+                            <a class="btn btn-outline-primary btn-lg" href="/search/">Open rank search</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
+
+        <footer class="footer py-4 mt-4">
+            <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+                <span class="fw-semibold">MyCollegeList</span>
+                <span>Use this project as a guide and verify final details officially</span>
+            </div>
+        </footer>
+
+        <script>
+            document.querySelectorAll(".college-search").forEach((form) => {
+                const input = form.querySelector(".college-search-input");
+                const menu = form.querySelector(".college-suggestions");
+                let controller;
+
+                function hideSuggestions() {
+                    menu.classList.remove("show");
+                    menu.innerHTML = "";
+                }
+
+                input.addEventListener("input", async () => {
+                    const query = input.value.trim();
+                    if (controller) controller.abort();
+                    if (query.length < 2) {
+                        hideSuggestions();
+                        return;
+                    }
+
+                    controller = new AbortController();
+                    const response = await fetch(`/college_suggestions?q=${encodeURIComponent(query)}`, {
+                        signal: controller.signal
+                    }).catch(() => null);
+                    if (!response) return;
+
+                    const data = await response.json();
+                    menu.innerHTML = "";
+                    data.results.forEach((college) => {
+                        const item = document.createElement("button");
+                        item.type = "button";
+                        item.className = "suggestion-item";
+                        item.innerHTML = `<div class="suggestion-code">${college.inst_code}</div><div class="suggestion-name">${college.inst_name}</div>`;
+                        item.addEventListener("click", () => {
+                            window.location.href = college.url;
+                        });
+                        menu.appendChild(item);
+                    });
+                    menu.classList.toggle("show", data.results.length > 0);
+                });
+
+                document.addEventListener("click", (event) => {
+                    if (!form.contains(event.target)) hideSuggestions();
+                });
+            });
+        </script>
     </body>
 </html>

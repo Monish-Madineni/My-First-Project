@@ -1,237 +1,846 @@
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>mycollegelist.xyz</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-            <style>
-                body {
-                    min-height: 100vh;
-                    background: #f4f7fb;
-                    color: #17212b;
-                    font-family: Arial, Helvetica, sans-serif;
+{% macro branch_full_name(code) -%}
+    {%- if code == 'CSE' -%}Computer Science and Engineering
+    {%- elif code == 'ECE' -%}Electronics and Communication Engineering
+    {%- elif code == 'EEE' -%}Electrical and Electronics Engineering
+    {%- elif code == 'MEC' -%}Mechanical Engineering
+    {%- elif code == 'CIV' -%}Civil Engineering
+    {%- elif code == 'INF' -%}Information Technology
+    {%- elif code == 'CSM' -%}Computer Science and Engineering (Artificial Intelligence and Machine Learning)
+    {%- elif code == 'CSD' -%}Computer Science and Engineering (Data Science)
+    {%- elif code == 'CSO' -%}Computer Science and Engineering (Internet of Things)
+    {%- elif code == 'CSC' -%}Computer Science and Engineering (Cyber Security)
+    {%- elif code == 'CSA' -%}Computer Science and Engineering (Artificial Intelligence)
+    {%- elif code == 'CSB' -%}Computer Science and Business Systems
+    {%- elif code == 'CSG' -%}Computer Science and Engineering (Artificial Intelligence and Data Science)
+    {%- elif code == 'CSN' -%}Computer Science and Engineering (Networks)
+    {%- elif code == 'AIM' -%}Artificial Intelligence and Machine Learning
+    {%- elif code == 'AI' -%}Artificial Intelligence
+    {%- elif code == 'AID' -%}Artificial Intelligence and Data Science
+    {%- elif code == 'CSW' -%}Computer Science and Engineering (Software Engineering)
+    {%- elif code == 'ECM' -%}Electronics and Computer Engineering
+    {%- elif code == 'ECI' -%}Electronics, Communication and Instrumentation Engineering
+    {%- elif code == 'EIE' -%}Electronics and Instrumentation Engineering
+    {%- elif code == 'CHE' -%}Chemical Engineering
+    {%- elif code == 'MET' -%}Metallurgical Engineering
+    {%- elif code == 'CME' -%}Computer Engineering
+    {%- elif code == 'MIN' -%}Mining Engineering
+    {%- elif code == 'MTE' -%}Metallurgical and Materials Engineering
+    {%- elif code == 'MCT' -%}Mechanical CAD/CAM Technology
+    {%- elif code == 'MMS' -%}Mechanical and Mechatronics Engineering
+    {%- elif code == 'BME' -%}Biomedical Engineering
+    {%- elif code == 'BSE' -%}Bio Science Engineering
+    {%- elif code == 'AGR' -%}Agricultural Engineering
+    {%- elif code == 'BIO' -%}Bio-Technology
+    {%- elif code == 'PHE' -%}Pharmaceutical Engineering
+    {%- elif code == 'AUT' -%}Automobile Engineering
+    {%- elif code == 'ANE' -%}Aeronautical Engineering
+    {%- elif code == 'DRG' -%}Dairy Technology
+    {%- elif code == 'EVL' -%}Electronics Engineering (VLSI Design and Technology)
+    {%- elif code == 'CIC' -%}CSE (IoT and Cyber Security including Blockchain Technology)
+    {%- elif code == 'FDT' -%}Food Technology
+    {%- elif code == 'DTD' -%}Digital Techniques for Design and Planning
+    {%- elif code == 'PLG' -%}Planning
+    {%- elif code == 'GEO' -%}Geo Informatics
+    {%- elif code == 'TEX' -%}Textile Technology
+    {%- else -%}{{ code }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% set course_groups = [
+    ('Core computing', ['CSE', 'CSM', 'CSD', 'CSO', 'CSC', 'CSA', 'CSB', 'CSG', 'CSN', 'AIM', 'AI', 'AID', 'CSW']),
+    ('Electronics and electrical', ['ECE', 'EEE', 'ECM', 'ECI', 'EIE', 'EVL', 'CIC']),
+    ('Mechanical and civil', ['MEC', 'CIV', 'AUT', 'ANE', 'MTE', 'MMS', 'MCT']),
+    ('Specialized branches', ['CHE', 'MET', 'CME', 'MIN', 'BME', 'BSE', 'AGR', 'BIO', 'PHE', 'DRG', 'FDT', 'DTD', 'PLG', 'GEO', 'TEX'])
+] %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>College Search | MyCollegeList</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <style>
+            :root {
+                --ink: #0f172a;
+                --muted: #64748b;
+                --line: #dbe4f0;
+                --page: #f8fafc;
+                --surface: #ffffff;
+                --surface-soft: #f3f7ff;
+                --primary: #2457f5;
+                --primary-strong: #183fc3;
+                --success: #059669;
+                --warning: #d97706;
+                --danger: #dc2626;
+                --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+                --shadow-hover: 0 22px 60px rgba(15, 23, 42, 0.12);
+                --radius: 8px;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                min-height: 100vh;
+                margin: 0;
+                color: var(--ink);
+                background:
+                    radial-gradient(circle at top left, rgba(36, 87, 245, 0.08), transparent 28%),
+                    radial-gradient(circle at top right, rgba(5, 150, 105, 0.06), transparent 24%),
+                    var(--page);
+                font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .brand-name {
+                font-family: "Space Grotesk", "Inter", sans-serif;
+                letter-spacing: 0;
+            }
+
+            .topbar {
+                position: sticky;
+                top: 0;
+                z-index: 40;
+                background: rgba(255, 255, 255, 0.92);
+                border-bottom: 1px solid rgba(219, 228, 240, 0.92);
+                backdrop-filter: blur(14px);
+            }
+
+            .brand-name {
+                color: var(--ink);
+                font-size: 1.35rem;
+                font-weight: 800;
+                text-decoration: none;
+            }
+
+            .brand-name span {
+                color: var(--primary);
+            }
+
+            .college-search {
+                position: relative;
+                max-width: 430px;
+                width: 100%;
+            }
+
+            .college-search .form-control,
+            .form-control,
+            .btn {
+                min-height: 44px;
+                border-radius: var(--radius);
+            }
+
+            .college-search .form-control,
+            .form-control {
+                border-color: var(--line);
+                box-shadow: none;
+            }
+
+            .college-search .form-control:focus,
+            .form-control:focus {
+                border-color: rgba(36, 87, 245, 0.45);
+                box-shadow: 0 0 0 0.2rem rgba(36, 87, 245, 0.08);
+            }
+
+            .college-suggestions {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                right: 0;
+                z-index: 50;
+                display: none;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow-hover);
+            }
+
+            .college-suggestions.show {
+                display: block;
+            }
+
+            .suggestion-item {
+                width: 100%;
+                padding: 0.85rem 0.95rem;
+                border: 0;
+                border-bottom: 1px solid var(--line);
+                background: #ffffff;
+                text-align: left;
+                transition: background 0.15s ease;
+            }
+
+            .suggestion-item:last-child {
+                border-bottom: 0;
+            }
+
+            .suggestion-item:hover {
+                background: #f6f9ff;
+            }
+
+            .suggestion-code {
+                color: var(--primary);
+                font-weight: 800;
+            }
+
+            .suggestion-name {
+                color: var(--muted);
+                font-size: 0.92rem;
+            }
+
+            .page-header {
+                border-bottom: 1px solid rgba(219, 228, 240, 0.9);
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 247, 255, 0.96));
+            }
+
+            .page-header h1 {
+                max-width: 840px;
+                margin: 0;
+                font-size: clamp(2rem, 4vw, 3.4rem);
+                line-height: 1.02;
+                letter-spacing: -0.03em;
+            }
+
+            .page-copy {
+                max-width: 720px;
+                color: var(--muted);
+                font-size: 1.03rem;
+                line-height: 1.7;
+            }
+
+            .section-label {
+                color: var(--primary);
+                font-size: 0.8rem;
+                font-weight: 900;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+
+            .trust-strip,
+            .filter-shell,
+            .results-shell,
+            .result-card,
+            .empty-state,
+            .branch-group {
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow);
+            }
+
+            .trust-strip {
+                margin-top: 1.25rem;
+                padding: 1rem;
+            }
+
+            .trust-chip,
+            .meta-chip,
+            .phase-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.42rem 0.72rem;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                background: #ffffff;
+                color: var(--muted);
+                font-size: 0.88rem;
+                font-weight: 700;
+            }
+
+            .trust-chip strong,
+            .meta-chip strong,
+            .phase-chip strong {
+                color: var(--ink);
+            }
+
+            .filter-shell {
+                position: sticky;
+                top: 92px;
+                padding: 1rem;
+            }
+
+            .filter-top {
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .filter-group {
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .filter-group:last-of-type {
+                border-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .group-head {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .group-copy {
+                color: var(--muted);
+                font-size: 0.92rem;
+                line-height: 1.55;
+            }
+
+            .branch-group {
+                padding: 0.9rem;
+                margin-bottom: 0.85rem;
+                background: linear-gradient(180deg, #ffffff, #f9fbff);
+            }
+
+            .branch-group:last-of-type {
+                margin-bottom: 0;
+            }
+
+            .branch-group-title {
+                margin-bottom: 0.55rem;
+                color: var(--ink);
+                font-size: 0.95rem;
+                font-weight: 800;
+            }
+
+            .branch-group-note {
+                margin-bottom: 0.85rem;
+                color: var(--muted);
+                font-size: 0.86rem;
+            }
+
+            .course-search-box .form-control {
+                min-height: 42px;
+            }
+
+            .options-wrap {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.55rem;
+            }
+
+            .form-check-input {
+                margin-right: 0.3rem;
+            }
+
+            .form-check-label {
+                display: inline-flex;
+                align-items: center;
+                min-height: 34px;
+                margin-right: 0;
+                padding: 0.25rem 0.6rem;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                background: #f8fafc;
+                color: #334155;
+                font-weight: 700;
+                transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+            }
+
+            .form-check-label:hover {
+                border-color: rgba(36, 87, 245, 0.24);
+                background: #eef4ff;
+                color: var(--primary-strong);
+                transform: translateY(-1px);
+            }
+
+            .course-option {
+                position: relative;
+                cursor: help;
+            }
+
+            .course-option::after {
+                content: attr(data-full);
+                position: absolute;
+                left: 0;
+                bottom: calc(100% + 8px);
+                z-index: 25;
+                width: max-content;
+                max-width: 310px;
+                padding: 0.55rem 0.75rem;
+                border-radius: var(--radius);
+                color: #ffffff;
+                background: #0f172a;
+                font-size: 0.84rem;
+                font-weight: 700;
+                line-height: 1.25;
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(4px);
+                transition: opacity 0.15s ease, transform 0.15s ease;
+            }
+
+            .course-option:hover::after {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .rank-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.85rem;
+            }
+
+            .results-shell {
+                padding: 1rem;
+            }
+
+            .results-title {
+                color: var(--ink);
+                font-weight: 900;
+                letter-spacing: -0.02em;
+            }
+
+            .result-card {
+                padding: 1rem;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            }
+
+            .result-card:hover {
+                transform: translateY(-2px);
+                border-color: rgba(36, 87, 245, 0.22);
+                box-shadow: var(--shadow-hover);
+            }
+
+            .match-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.38rem 0.72rem;
+                border-radius: 999px;
+                font-size: 0.82rem;
+                font-weight: 800;
+            }
+
+            .match-badge.safe {
+                background: rgba(5, 150, 105, 0.12);
+                color: var(--success);
+            }
+
+            .match-badge.moderate {
+                background: rgba(217, 119, 6, 0.14);
+                color: var(--warning);
+            }
+
+            .match-badge.dream {
+                background: rgba(220, 38, 38, 0.12);
+                color: var(--danger);
+            }
+
+            .college-link {
+                color: var(--ink);
+                font-weight: 900;
+                text-decoration: none;
+            }
+
+            .college-link:hover {
+                color: var(--primary);
+            }
+
+            .result-subtitle {
+                color: var(--muted);
+                line-height: 1.6;
+            }
+
+            .result-meta-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.55rem;
+                margin-top: 0.85rem;
+            }
+
+            .meta-chip {
+                padding-inline: 0.7rem;
+                background: #f8fafc;
+            }
+
+            .result-rank-wrap {
+                min-width: 140px;
+            }
+
+            .result-rank-label {
+                color: var(--muted);
+                font-size: 0.82rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+            }
+
+            .result-rank {
+                color: var(--ink);
+                font-size: 1.55rem;
+                font-weight: 900;
+                line-height: 1;
+            }
+
+            .rank-pill {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.45rem 0.75rem;
+                border-radius: 999px;
+                color: #086044;
+                background: #e4f7ef;
+                font-weight: 900;
+            }
+
+            .results-summary {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.55rem;
+            }
+
+            .empty-state {
+                padding: 2rem;
+                text-align: center;
+            }
+
+            .footer {
+                color: var(--muted);
+                border-top: 1px solid rgba(219, 228, 240, 0.9);
+                background: #ffffff;
+            }
+
+            .course-empty {
+                display: none;
+                padding: 0.85rem;
+                border: 1px dashed var(--line);
+                border-radius: var(--radius);
+                color: var(--muted);
+                font-size: 0.92rem;
+                background: #fafcff;
+            }
+
+            @media (max-width: 991px) {
+                .filter-shell {
+                    position: static;
+                }
+            }
+
+            @media (max-width: 767px) {
+                .topbar .container {
+                    align-items: stretch !important;
+                    flex-direction: column;
                 }
 
-                .topbar {
-                    background: #ffffff;
-                    border-bottom: 1px solid #d9e2ec;
+                .college-search {
+                    max-width: none;
                 }
 
-                .brand-name {
-                    color: #17212b;
-                    font-size: 1.35rem;
-                    font-weight: 900;
-                    letter-spacing: 0;
+                .rank-grid,
+                .compare-head,
+                .compare-row,
+                .page-header .row {
+                    grid-template-columns: 1fr;
                 }
 
-                .brand-name span {
-                    color: #2563eb;
+                .result-rank-wrap {
+                    min-width: 0;
                 }
-
-                .page-header {
-                    background: linear-gradient(135deg, #eaf2ff 0%, #f8fbff 58%, #ffffff 100%);
-                    border-bottom: 1px solid #d9e2ec;
-                }
-
-                .selector-card,
-                .result-card {
-                    background: #ffffff;
-                    border: 1px solid #d9e2ec;
-                    border-radius: 8px;
-                    box-shadow: 0 16px 40px rgba(23, 33, 43, 0.06);
-                }
-
-                .section-title {
-                    margin-top: 1.6rem;
-                    margin-bottom: 0.8rem;
-                    color: #17212b;
-                    font-size: 1rem;
-                    font-weight: 800;
-                    letter-spacing: 0.06em;
-                    text-transform: uppercase;
-                }
-
-                .options-wrap {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.55rem 0.85rem;
-                }
-
-                .course-option {
-                    position: relative;
-                    border-radius: 6px;
-                    cursor: help;
-                }
-
-                .course-option::after {
-                    content: attr(data-full);
-                    position: absolute;
-                    left: 0;
-                    bottom: calc(100% + 8px);
-                    z-index: 10;
-                    width: max-content;
-                    max-width: 280px;
-                    padding: 0.45rem 0.65rem;
-                    border-radius: 6px;
-                    color: #ffffff;
-                    background: #17212b;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    line-height: 1.25;
-                    opacity: 0;
-                    pointer-events: none;
-                    transform: translateY(4px);
-                    transition: opacity 0.15s ease, transform 0.15s ease;
-                }
-
-                .course-option:hover::after {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-
-                .form-check-input {
-                    margin-right: 0.25rem;
-                }
-
-                .form-check-label {
-                    margin-right: 0.55rem;
-                    padding: 0.25rem 0;
-                    font-weight: 600;
-                }
-
-                .form-control {
-                    min-height: 46px;
-                    border-color: #d9e2ec;
-                }
-
-                .form-control:focus {
-                    border-color: #2563eb;
-                    box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.15);
-                }
-
-                .results-title {
-                    color: #17212b;
-                    font-weight: 800;
-                    letter-spacing: 0.04em;
-                }
-
-                .result-card a {
-                    color: #1e40af;
-                    font-weight: 800;
-                    text-decoration: none;
-                }
-
-                .result-card a:hover {
-                    text-decoration: underline;
-                }
-
-                .rank-pill {
-                    display: inline-block;
-                    padding: 0.35rem 0.75rem;
-                    border-radius: 999px;
-                    color: #086044;
-                    background: #e4f7ef;
-                    font-weight: 800;
-                }
-            </style>
-        </head>
-        <body>
-            <nav class="topbar py-3">
-                <div class="container d-flex align-items-center justify-content-between gap-3">
-                    <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
-                        <span class="brand-name">MyCollege<span>List</span></span>
-                    </a>
-                    <a class="btn btn-outline-primary" href="/">Home</a>
-                </div>
-            </nav>
-
-            <header class="page-header py-5">
-                <div class="container">
-                    <span class="badge text-bg-primary mb-3">MyCollegeList</span>
-                    <h1 class="display-4 fw-bold mb-3">College Selector</h1>
-                    <p class="lead text-secondary mb-0">Choose your course, category, gender, and rank range to view matching colleges.</p>
-                </div>
-            </header>
-
-            <main class="container py-5">
-            <form method="post" action="/search_results" class="selector-card p-3 p-md-4 mb-5">
-                <h1 class="visually-hidden">College Selector</h1>
-                <h3 class="section-title">SELECT COURSES</h3>
-                <div class="options-wrap">
-                {% for i in course_types %}
-                    <input class="form-check-input" type="checkbox" name="courses" value='{{i}}' id="course_{{i}}" 
-                    {%if selected_courses%}
-                        {%if i in selected_courses%}checked{% endif %}
-                    {%elif i=="CSE"%}checked{%endif%}
-                    >
-                    <label class="form-check-label course-option" for="course_{{i}}" data-full="{% if i == 'CSE' %}Computer Science and Engineering{% elif i == 'ECE' %}Electronics and Communication Engineering{% elif i == 'EEE' %}Electrical and Electronics Engineering{% elif i == 'MEC' %}Mechanical Engineering{% elif i == 'CIV' %}Civil Engineering{% elif i == 'INF' %}Information Technology{% elif i == 'CSM' %}Computer Science and Engineering (Artificial Intelligence and Machine Learning){% elif i == 'CSD' %}Computer Science and Engineering (Data Science){% elif i == 'CSO' %}Computer Science and Engineering (Internet of Things){% elif i == 'CSC' %}Computer Science and Engineering (Cyber Security){% elif i == 'CSA' %}Computer Science and Engineering (Artificial Intelligence){% elif i == 'CSB' %}Computer Science and Business Systems{% elif i == 'CSG' %}Computer Science and Engineering (Artificial Intelligence and Data Science){% elif i == 'CSN' %}Computer Science and Engineering (Networks){% elif i == 'AIM' %}Artificial Intelligence and Machine Learning{% elif i == 'AI' %}Artificial Intelligence{% elif i == 'AID' %}Artificial Intelligence and Data Science{% elif i == 'CSW' %}Computer Science and Engineering (Software Engineering){% elif i == 'ECM' %}Electronics and Computer Engineering{% elif i == 'ECI' %}Electronics, Communication and Instrumentation Engineering{% elif i == 'EIE' %}Electronics and Instrumentation Engineering{% elif i == 'CHE' %}Chemical Engineering{% elif i == 'MET' %}Metallurgical Engineering{% elif i == 'CME' %}Computer Engineering{% elif i == 'MIN' %}Mining Engineering{% elif i == 'MTE' %}Metallurgical and Materials Engineering{% elif i == 'MCT' %}Mechanical CAD/CAM Technology{% elif i == 'MMS' %}Mechanical and Mechatronics Engineering{% elif i == 'BME' %}Biomedical Engineering{% elif i == 'BSE' %}Bio Science Engineering{% elif i == 'AGR' %}Agricultural Engineering{% elif i == 'BIO' %}Bio-Technology{% elif i == 'PHE' %}Pharmaceutical Engineering{% elif i == 'AUT' %}Automobile Engineering{% elif i == 'ANE' %}Aeronautical Engineering{% elif i == 'DRG' %}Dairy Technology{% elif i == 'EVL' %}Electronics Engineering (VLSI Design and Technology){% elif i == 'CIC' %}CSE (IoT and Cyber Security including Blockchain Technology){% elif i == 'FDT' %}Food Technology{% elif i == 'DTD' %}Digital Techniques for Design and Planning{% elif i == 'PLG' %}Planning{% elif i == 'GEO' %}Geo Informatics{% elif i == 'TEX' %}Textile Technology{% else %}{{i}}{% endif %}" title="{% if i == 'CSE' %}Computer Science and Engineering{% elif i == 'ECE' %}Electronics and Communication Engineering{% elif i == 'EEE' %}Electrical and Electronics Engineering{% elif i == 'MEC' %}Mechanical Engineering{% elif i == 'CIV' %}Civil Engineering{% elif i == 'INF' %}Information Technology{% elif i == 'CSM' %}Computer Science and Engineering (Artificial Intelligence and Machine Learning){% elif i == 'CSD' %}Computer Science and Engineering (Data Science){% elif i == 'CSO' %}Computer Science and Engineering (Internet of Things){% elif i == 'CSC' %}Computer Science and Engineering (Cyber Security){% elif i == 'CSA' %}Computer Science and Engineering (Artificial Intelligence){% elif i == 'CSB' %}Computer Science and Business Systems{% elif i == 'CSG' %}Computer Science and Engineering (Artificial Intelligence and Data Science){% elif i == 'CSN' %}Computer Science and Engineering (Networks){% elif i == 'AIM' %}Artificial Intelligence and Machine Learning{% elif i == 'AI' %}Artificial Intelligence{% elif i == 'AID' %}Artificial Intelligence and Data Science{% elif i == 'CSW' %}Computer Science and Engineering (Software Engineering){% elif i == 'ECM' %}Electronics and Computer Engineering{% elif i == 'ECI' %}Electronics, Communication and Instrumentation Engineering{% elif i == 'EIE' %}Electronics and Instrumentation Engineering{% elif i == 'CHE' %}Chemical Engineering{% elif i == 'MET' %}Metallurgical Engineering{% elif i == 'CME' %}Computer Engineering{% elif i == 'MIN' %}Mining Engineering{% elif i == 'MTE' %}Metallurgical and Materials Engineering{% elif i == 'MCT' %}Mechanical CAD/CAM Technology{% elif i == 'MMS' %}Mechanical and Mechatronics Engineering{% elif i == 'BME' %}Biomedical Engineering{% elif i == 'BSE' %}Bio Science Engineering{% elif i == 'AGR' %}Agricultural Engineering{% elif i == 'BIO' %}Bio-Technology{% elif i == 'PHE' %}Pharmaceutical Engineering{% elif i == 'AUT' %}Automobile Engineering{% elif i == 'ANE' %}Aeronautical Engineering{% elif i == 'DRG' %}Dairy Technology{% elif i == 'EVL' %}Electronics Engineering (VLSI Design and Technology){% elif i == 'CIC' %}CSE (IoT and Cyber Security including Blockchain Technology){% elif i == 'FDT' %}Food Technology{% elif i == 'DTD' %}Digital Techniques for Design and Planning{% elif i == 'PLG' %}Planning{% elif i == 'GEO' %}Geo Informatics{% elif i == 'TEX' %}Textile Technology{% else %}{{i}}{% endif %}">
-                        {{i}}               
-                    </label>
-                {% endfor %}
-                </div>
-                <br>
-                <h3 class="section-title">SELECT CASTE</h3> 
-                <div class="options-wrap">
-                {% for i in caste_types %}
-                    <input class="form-check-input" type="radio" name="caste" value="{{i}}" id="caste_{{i}}" {% if i == selected_caste or (not selected_caste and i == "OC") %}checked{% endif %}>
-                    <label class="form-check-label" for="caste_{{i}}">
-                        {{i}}
-                    </label>
-                {% endfor %}
-                </div>
-                <br>
-                <h3 class="section-title">SELECT GENDER</h3>
-                <div class="options-wrap">
-                    <input class="form-check-input" type="radio" name="gender" value="BOY" id="gender_BOY" {%if selected_gender=="BOY" or not selected_gender%}checked{% endif %}>
-                    <label class="form-check-label" for="gender_BOY">
-                        BOY
-                    </label>
-
-                    <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL"  {%if selected_gender=="GIRL"%}checked{% endif %}>
-                    <label class="form-check-label" for="gender_GIRL">
-                        GIRL
-                    </label>
-                </div>
-                <br>
-                <h3 class="section-title">SELECT PHASE</h3>
-                <div class="options-wrap">
-                    <input class="form-check-input" type="radio" name="phase" value=3 id="LastRank" {% if selected_phase == 3 or not selected_phase %}checked{% endif %}>
-                    <label class="form-check-label" for="LastRank">
-                        Last Phase/Last Rank
-                    </label>
-                    <input class="form-check-input" type="radio" name="phase" value=2 id="phase2" {% if selected_phase == 2 %}checked{% endif %}>
-                    <label class="form-check-label" for="phase2">
-                        Phase 2
-                    </label>
-                    <input class="form-check-input" type="radio" name="phase" value=1 id="phase1" {% if selected_phase == 1 %}checked{% endif %}>
-                    <label class="form-check-label" for="phase1">
-                        Phase 1
-                    </label>
-                </div>
-                <br>
-                <h3 class="section-title">SELECT LAST RANK RANGE</h3>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                <input class="form-control" type="number" name="lower_rank" {%if selected_lowerrank%} value="{{selected_lowerrank}}" {%else%}value="0"{%endif%}>
-                    </div>
-                    <div class="col-md-6">
-                <input class="form-control" type="number" name="upper_rank" {%if selected_upperrank%} value="{{selected_upperrank}}" {%else%}value="10000"{%endif%}>
-                    </div>
-                </div>
-                <br>
-                <button type="submit" class="btn btn-primary btn-lg px-5">Search</button>
-            </form>
-            <h3 class="results-title mb-3">RESULTS:</h3>
-            <div class="d-grid gap-3">
-            {% for i in results %}
-                <div class="result-card p-3">
-                <h6><a href=/colleges/{{i.inst_code}}>College: {{i.college}}</a></h6>
-                <h6>Course: {{i.course}}</h6>
-                <h6><span class="rank-pill">Last Rank: {{i.last_rank}}</span></h6>
-                </div>
-                <br>
-            {% endfor %}
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="topbar py-3">
+            <div class="container d-flex align-items-center justify-content-between gap-3">
+                <a class="brand-name" href="/">MyCollege<span>List</span></a>
+                <form class="college-search d-flex flex-grow-1 flex-md-grow-0" method="get" action="/college_search" role="search">
+                    <input class="form-control college-search-input" type="search" name="q" placeholder="Search college name or code" aria-label="Search college name or code" autocomplete="off" required>
+                    <button class="btn btn-primary ms-2" type="submit">Search</button>
+                    <div class="college-suggestions"></div>
+                </form>
+                <a class="btn btn-outline-primary" href="/">Home</a>
             </div>
-            </main>
-        </body>
-    </html>
+        </nav>
 
+        <header class="page-header py-4 py-lg-5">
+            <div class="container">
+                <span class="badge text-bg-primary mb-3">Rank search</span>
+                <h1 class="fw-bold mb-3">Find TS EAPCET colleges that match your profile.</h1>
+                <p class="page-copy mb-0">Choose branch, category, gender, counselling phase, and rank range to build a shortlist that students can actually scan quickly.</p>
+
+                <div class="trust-strip">
+                    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                        <div class="results-summary">
+                            <span class="trust-chip">Official counselling cutoff data</span>
+                            <span class="trust-chip"><strong>150+</strong> colleges indexed</span>
+                            <span class="trust-chip"><strong>45+</strong> branch codes</span>
+                            <span class="trust-chip"><strong>9</strong> category columns</span>
+                        </div>
+                        <span class="trust-chip">Autocomplete-ready college search</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container py-4 py-lg-5">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-5 col-xl-4">
+                    <form method="post" action="/search_results" class="filter-shell">
+                        <h1 class="visually-hidden">College Selector</h1>
+                        <div class="filter-top">
+                            <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                <div>
+                                    <div class="section-label mb-1">Filters</div>
+                                    <h2 class="h4 fw-bold mb-0">Build your shortlist</h2>
+                                </div>
+                                <span class="badge text-bg-light border">TS EAPCET</span>
+                            </div>
+                            <p class="group-copy mb-0">Search branches, compare phases, and keep the rank range focused on what matters to you.</p>
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="group-head">
+                                <div>
+                                    <h3 class="section-label mb-2">Select courses</h3>
+                                    <p class="group-copy mb-0">Start with a branch group or search a code inside the chips.</p>
+                                </div>
+                            </div>
+
+                            <div class="course-search-box mb-3">
+                                <label class="form-label fw-semibold mb-2" for="course_filter">Find a branch</label>
+                                <input class="form-control" type="search" id="course_filter" placeholder="Type CSE, AI, ECE, Mechanical..." data-course-search>
+                            </div>
+
+                            <div class="course-empty" data-course-empty>No branches match that search.</div>
+
+                            {% for group_name, group_codes in course_groups %}
+                                <div class="branch-group" data-course-group>
+                                    <div class="branch-group-title">{{ group_name }}</div>
+                                    <div class="branch-group-note">Hover a chip to see the full branch name.</div>
+                                    <div class="options-wrap">
+                                        {% for i in course_types|unique if i in group_codes %}
+                                            <input class="form-check-input" type="checkbox" name="courses" value="{{ i }}" id="course_{{ i }}"
+                                            {% if selected_courses is defined %}
+                                                {% if i in selected_courses %}checked{% endif %}
+                                            {% elif i == "CSE" %}checked{% endif %}>
+                                            <label class="form-check-label course-option" for="course_{{ i }}" data-course-chip data-course-code="{{ i }}" data-course-full="{{ branch_full_name(i)|e }}" data-full="{{ branch_full_name(i)|e }}" title="{{ branch_full_name(i)|e }}">
+                                                {{ i }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="filter-group">
+                            <h3 class="section-label mb-3">Select caste</h3>
+                            <div class="options-wrap">
+                                {% for i in caste_types %}
+                                    <input class="form-check-input" type="radio" name="caste" value="{{ i }}" id="caste_{{ i }}" {% if i == selected_caste or (selected_caste is not defined and i == "OC") %}checked{% endif %}>
+                                    <label class="form-check-label" for="caste_{{ i }}">
+                                        {{ i }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h3 class="section-label mb-3">Select gender</h3>
+                            <div class="options-wrap">
+                                <input class="form-check-input" type="radio" name="gender" value="BOY" id="gender_BOY" {% if selected_gender == "BOY" or selected_gender is not defined %}checked{% endif %}>
+                                <label class="form-check-label" for="gender_BOY">BOY</label>
+
+                                <input class="form-check-input" type="radio" name="gender" value="GIRL" id="gender_GIRL" {% if selected_gender == "GIRL" %}checked{% endif %}>
+                                <label class="form-check-label" for="gender_GIRL">GIRL</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h3 class="section-label mb-3">Select phase</h3>
+                            <div class="options-wrap">
+                                <input class="form-check-input" type="radio" name="phase" value="3" id="LastRank" {% if selected_phase == 3 or selected_phase is not defined %}checked{% endif %}>
+                                <label class="form-check-label phase-chip" for="LastRank">Last Phase / Last Rank</label>
+
+                                <input class="form-check-input" type="radio" name="phase" value="2" id="phase2" {% if selected_phase == 2 %}checked{% endif %}>
+                                <label class="form-check-label phase-chip" for="phase2">Phase 2</label>
+
+                                <input class="form-check-input" type="radio" name="phase" value="1" id="phase1" {% if selected_phase == 1 %}checked{% endif %}>
+                                <label class="form-check-label phase-chip" for="phase1">Phase 1</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h3 class="section-label mb-3">Select last rank range</h3>
+                            <div class="rank-grid">
+                                <div>
+                                    <label class="form-label fw-semibold" for="lower_rank">From</label>
+                                    <input class="form-control" type="number" name="lower_rank" id="lower_rank" {% if selected_lowerrank is defined %}value="{{ selected_lowerrank }}"{% else %}value="0"{% endif %}>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-semibold" for="upper_rank">To</label>
+                                    <input class="form-control" type="number" name="upper_rank" id="upper_rank" {% if selected_upperrank is defined %}value="{{ selected_upperrank }}"{% else %}value="10000"{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Search matching colleges</button>
+                    </form>
+                </div>
+
+                <div class="col-lg-7 col-xl-8">
+                    <section class="results-shell">
+                        <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-3">
+                            <div>
+                                <div class="section-label mb-2">Results</div>
+                                <h2 class="results-title h3 mb-0">Matching colleges</h2>
+                                <p class="group-copy mt-2 mb-0">Compare colleges by rank fit, branch, and college profile. Open any card to review the full college page.</p>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-muted fw-bold">{{ results|length }} matches</div>
+                                <div class="results-summary mt-2 justify-content-md-end">
+                                    {% if selected_caste is defined %}<span class="meta-chip">Category <strong>{{ selected_caste }}</strong></span>{% endif %}
+                                    {% if selected_gender is defined %}<span class="meta-chip">Gender <strong>{{ selected_gender }}</strong></span>{% endif %}
+                                    {% if selected_phase is defined %}<span class="meta-chip">Phase <strong>{% if selected_phase == 1 %}1{% elif selected_phase == 2 %}2{% else %}Last Rank{% endif %}</strong></span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if results %}
+                            <div class="d-grid gap-3">
+                                {% for i in results %}
+                                    
+                                    <article class="result-card">
+                                        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                                            <div class="flex-grow-1">
+                                                <span class="match-badge {{ badge_class }} mb-3">{{ badge_label }}</span>
+                                                <h3 class="h5 mb-1">
+                                                    <a class="college-link" href="/colleges/{{ i.inst_code }}">College: {{ i.college }}</a>
+                                                </h3>
+                                                <div class="result-subtitle mb-2">Course: {{ i.course }}</div>
+                                                <div class="result-meta-row">
+                                                    <span class="meta-chip">Code <strong>{{ i.inst_code }}</strong></span>
+                                                    <span class="meta-chip">Rank window match</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-lg-end result-rank-wrap">
+                                                <div class="result-rank-label mb-1">Last rank</div>
+                                                <div class="result-rank">{{ i.last_rank }}</div>
+                                                <span class="rank-pill mt-2">Counselling cutoff</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+                                            <div class="text-muted small">Open the college page to review every branch and fee detail.</div>
+                                            <a class="btn btn-outline-primary btn-sm" href="/colleges/{{ i.inst_code }}">View college</a>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <div class="section-label mb-2">No colleges yet</div>
+                                <h3 class="h4 fw-bold">Run a search to generate your shortlist.</h3>
+                                <p class="text-muted mb-0">Select your branch, category, gender, phase, and rank range to see matching colleges here.</p>
+                            </div>
+                        {% endif %}
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer py-4 mt-4">
+            <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+                <span class="fw-semibold">MyCollegeList</span>
+                <span>Use this project as a guide and verify final details officially</span>
+            </div>
+        </footer>
+
+        <script>
+            document.querySelectorAll(".college-search").forEach((form) => {
+                const input = form.querySelector(".college-search-input");
+                const menu = form.querySelector(".college-suggestions");
+                let controller;
+
+                function hideSuggestions() {
+                    menu.classList.remove("show");
+                    menu.innerHTML = "";
+                }
+
+                input.addEventListener("input", async () => {
+                    const query = input.value.trim();
+                    if (controller) controller.abort();
+                    if (query.length < 2) {
+                        hideSuggestions();
+                        return;
+                    }
+
+                    controller = new AbortController();
+                    const response = await fetch(`/college_suggestions?q=${encodeURIComponent(query)}`, {
+                        signal: controller.signal
+                    }).catch(() => null);
+                    if (!response) return;
+
+                    const data = await response.json();
+                    menu.innerHTML = "";
+                    data.results.forEach((college) => {
+                        const item = document.createElement("button");
+                        item.type = "button";
+                        item.className = "suggestion-item";
+                        item.innerHTML = `<div class="suggestion-code">${college.inst_code}</div><div class="suggestion-name">${college.inst_name}</div>`;
+                        item.addEventListener("click", () => {
+                            window.location.href = college.url;
+                        });
+                        menu.appendChild(item);
+                    });
+                    menu.classList.toggle("show", data.results.length > 0);
+                });
+
+                document.addEventListener("click", (event) => {
+                    if (!form.contains(event.target)) hideSuggestions();
+                });
+            });
+
+            const courseSearch = document.querySelector("[data-course-search]");
+            if (courseSearch) {
+                const groupCards = Array.from(document.querySelectorAll("[data-course-group]"));
+                const courseEmpty = document.querySelector("[data-course-empty]");
+
+                const applyCourseFilter = () => {
+                    const term = courseSearch.value.trim().toLowerCase();
+                    let visibleCount = 0;
+
+                    groupCards.forEach((group) => {
+                        let groupVisible = 0;
+                        group.querySelectorAll("[data-course-chip]").forEach((chip) => {
+                            const haystack = `${chip.dataset.courseCode || ""} ${chip.dataset.courseFull || ""}`.toLowerCase();
+                            const match = !term || haystack.includes(term);
+                            chip.classList.toggle("d-none", !match);
+                            const input = document.getElementById(chip.getAttribute("for"));
+                            if (input) {
+                                input.classList.toggle("d-none", !match);
+                            }
+                            if (match) {
+                                groupVisible += 1;
+                                visibleCount += 1;
+                            }
+                        });
+                        group.classList.toggle("d-none", groupVisible === 0);
+                    });
+
+                    if (courseEmpty) {
+                        courseEmpty.style.display = visibleCount === 0 ? "block" : "none";
+                    }
+                };
+
+                courseSearch.addEventListener("input", applyCourseFilter);
+                applyCourseFilter();
+            }
+        </script>
+    </body>
+</html>
