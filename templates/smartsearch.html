@@ -564,10 +564,7 @@
                     <button class="btn btn-primary ms-2" type="submit">Search</button>
                     <div class="college-suggestions"></div>
                 </form>
-                <div class="d-flex align-items-center gap-2">
-                    <a class="btn btn-primary" href="/smart_search/">Smart Search</a>
-                    <a class="btn btn-outline-primary" href="/">Home</a>
-                </div>
+                <a class="btn btn-outline-primary" href="/">Home</a>
             </div>
         </nav>
 
@@ -594,7 +591,7 @@
         <main class="container py-4 py-lg-5">
             <div class="row g-4 align-items-start">
                 <div class="col-lg-5 col-xl-4">
-                    <form method="post" action="/search_results" class="filter-shell">
+                    <form method="post" action="/smart_search_results" class="filter-shell">
                         <h1 class="visually-hidden">College Selector</h1>
                         <div class="filter-top">
                             <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
@@ -677,17 +674,13 @@
                                 <label class="form-check-label phase-chip" for="phase1">Phase 1</label>
                             </div>
                         </div>
-
+                        
                         <div class="filter-group">
-                            <h3 class="section-label mb-3">Select last rank range</h3>
+                            <h3 class="section-label mb-3">Enter Your Rank</h3>
                             <div class="rank-grid">
                                 <div>
-                                    <label class="form-label fw-semibold" for="lower_rank">From</label>
-                                    <input class="form-control" type="number" name="lower_rank" id="lower_rank" {% if selected_lowerrank is defined %}value="{{ selected_lowerrank }}"{% else %}value="0"{% endif %}>
-                                </div>
-                                <div>
-                                    <label class="form-label fw-semibold" for="upper_rank">To</label>
-                                    <input class="form-control" type="number" name="upper_rank" id="upper_rank" {% if selected_upperrank is defined %}value="{{ selected_upperrank }}"{% else %}value="10000"{% endif %}>
+                                    <label class="form-label fw-semibold" for="user_rank">From</label>
+                                    <input class="form-control" type="number" name="user_rank" id="user_rank" {% if selected_userrank is defined %}value="{{ selected_userrank }}"{% else %}value="0"{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -717,6 +710,23 @@
                         {% if results %}
                             <div class="d-grid gap-3">
                                 {% for i in results %}
+                                    {% set rank_value = i.last_rank|int %}
+                                    {% if selected_userrank is defined %}
+                                        {% set user_rank = selected_userrank|int %}
+                                        {% if rank_value > user_rank %}
+                                            {% set badge_class = "safe" %}
+                                            {% set badge_label = "Safe Match" %}
+                                        {% elif rank_value >= (user_rank * 0.85)|int %}
+                                            {% set badge_class = "moderate" %}
+                                            {% set badge_label = "Moderate Match" %}
+                                        {% else %}
+                                            {% set badge_class = "dream" %}
+                                            {% set badge_label = "Dream Match" %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set badge_class = "moderate" %}
+                                        {% set badge_label = "Moderate Match" %}
+                                    {% endif %}
                                     
                                     <article class="result-card">
                                         <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">

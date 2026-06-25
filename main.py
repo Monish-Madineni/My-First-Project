@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from rapidfuzz import fuzz, process
 import os
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -18,6 +19,7 @@ templates = Jinja2Templates(
 
 course_types=["CSE", "ECE", "EEE", "MEC", "CIV", "INF", "CSM", "CSD", "CSO", "CSC", "CSA", "CSB", "CSG", "CSN", "AIM", "AI", "AID", "CSW", "ECM", "ECI", "EIE", "CHE", "MET", "CME", "MIN", "MTE", "MCT", "MMS", "BME", "BSE", "AGR", "BIO", "PHE", "AUT", "ANE", "DRG", "EVL", "CIC", "CIC", "FDT", "DTD", "PLG", "GEO", "TEX"]
 caste_types=["OC","BC_A","BC_B","BC_C","BC_D","BC_E","ST","SC","EWS"]
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/search/")
 def homepage(request: Request):
@@ -25,6 +27,20 @@ def homepage(request: Request):
     return templates.TemplateResponse(
         request,
         "search.html",
+        {
+            "request": request,
+            "course_types": course_types,
+            "caste_types": caste_types,
+            "results": []
+        }
+    )
+
+@app.get("/smart_search/")
+def homepage(request: Request):
+
+    return templates.TemplateResponse(
+        request,
+        "smartsearch.html",
         {
             "request": request,
             "course_types": course_types,
@@ -219,60 +235,86 @@ def db_querying(session: Session, filters: CollegeFilter):
 
     statement=(select(Colleges,course_table).join(course_table,Colleges.inst_code==course_table.inst_code))
 
-    # COURSE FILTERS
-    if filters.lower_rank==None:
-        filters.lower_rank=0
-    if filters.upper_rank==None:
-        filters.upper_rank=10000
-
-    if filters.courses:
-        statement=statement.where(course_table.branch_code.in_(filters.courses))
-        
-    
     if filters.caste:
         caste_type=filters.caste
     else:
         caste_type="ocb"
 
-
     caste_column=getattr(course_table,caste_type)
 
+    if filters.upper_rank==112345678:
+        safe_statement = statement.where(caste_column < filters.lower_rank).order_by(caste_column.desc()).limit(5)
+        safe_results = session.exec(safe_statement).all()
+        results=session.exec(statement).all()
 
-    if filters.lower_rank is not None:
-        statement=statement.where(caste_column>=filters.lower_rank)
-    if filters.upper_rank is not None:
-        statement=statement.where(caste_column<=filters.upper_rank)
-    
-    #   COLLEGE FILTERS
+        safe_results.reverse()
 
-    if filters.include_dist_codes:
-        statement=statement.where(Colleges.dist_code.in_(filters.include_dist_codes))
-    if filters.exclude_dist_codes:
-        statement=statement.where(Colleges.dist_code.notin_(filters.exclude_dist_codes))
-    if filters.include_places:
-        statement=statement.where(Colleges.place.in_(filters.include_places))
-    if filters.exclude_places:
-        statement=statement.where(Colleges.place.notin_(filters.exclude_places))
-    if filters.coed:
-        statement=statement.where(Colleges.coed==filters.coed)
-    if filters.include_college_types:
-        statement=statement.where(Colleges.type.in_(filters.include_college_types))
-    if filters.exclude_college_types:
-        statement=statement.where(Colleges.type.notin_(filters.exclude_college_types))
-    statement = statement.order_by(caste_column.asc())
+        normal_statement = statement.where(caste_column >= filters.lower_rank)
 
-    results=session.exec(statement).all()
-    response = []
+        if filters.upper_rank is not None:
+            normal_statement = normal_statement.where(caste_column <= filters.upper_rank)
 
-    
-    for college, course in results:
-        response.append({
-            "college": college.inst_name,
-            "course": course.branch_name,
-            "last_rank": getattr(course,caste_type),
-            "inst_code": college.inst_code
-        })
-    return response
+        normal_statement = normal_statement.order_by(caste_column.asc())
+        normal_results = session.exec(normal_statement).all()
+
+        results = safe_results + normal_results
+
+        response=[]
+        
+        for college, course in results:
+            response.append({
+                "college": college.inst_name,
+                "course": course.branch_name,
+                "last_rank": getattr(course,caste_type),
+                "inst_code": college.inst_code
+            })
+        return response
+    else:
+
+        # COURSE FILTERS
+        if filters.lower_rank==None:
+            filters.lower_rank=0
+        if filters.upper_rank==None:
+            filters.upper_rank=10000
+
+        if filters.courses:
+            statement=statement.where(course_table.branch_code.in_(filters.courses))
+
+        if filters.lower_rank is not None:
+            statement=statement.where(caste_column>=filters.lower_rank)
+        if filters.upper_rank is not None:
+            statement=statement.where(caste_column<=filters.upper_rank)
+        
+        #   COLLEGE FILTERS
+
+        if filters.include_dist_codes:
+            statement=statement.where(Colleges.dist_code.in_(filters.include_dist_codes))
+        if filters.exclude_dist_codes:
+            statement=statement.where(Colleges.dist_code.notin_(filters.exclude_dist_codes))
+        if filters.include_places:
+            statement=statement.where(Colleges.place.in_(filters.include_places))
+        if filters.exclude_places:
+            statement=statement.where(Colleges.place.notin_(filters.exclude_places))
+        if filters.coed:
+            statement=statement.where(Colleges.coed==filters.coed)
+        if filters.include_college_types:
+            statement=statement.where(Colleges.type.in_(filters.include_college_types))
+        if filters.exclude_college_types:
+            statement=statement.where(Colleges.type.notin_(filters.exclude_college_types))
+        statement = statement.order_by(caste_column.asc())
+
+        results=session.exec(statement).all()
+        response = []
+
+        
+        for college, course in results:
+            response.append({
+                "college": college.inst_name,
+                "course": course.branch_name,
+                "last_rank": getattr(course,caste_type),
+                "inst_code": college.inst_code
+            })
+        return response
 @app.get("/")
 def homepage(request: Request ):
     return templates.TemplateResponse(
@@ -305,6 +347,29 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
         {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_lowerrank":lower_rank,"selected_upperrank":upper_rank,"selected_phase":phase, "results": response }
     )
 
+@app.post("/smart_search_results")
+def read_colleges( session: SessionDep,request: Request,courses: list[str] = Form(None),caste: str = Form(None),user_rank: int = Form(None),gender: str=Form(None),phase: int = Form(None)):
+    caste=caste or "OC"
+    gender=gender or "BOYS"
+    user_rank=user_rank or 0
+    courses=courses or ["CSE"]
+    phase=phase or 3
+    filters = CollegeFilter(
+        courses=courses,
+        caste=(caste+gender[0]).lower(),
+        lower_rank=user_rank,
+        upper_rank=112345678,
+        phase=phase
+    )
+
+    response=db_querying(session,filters)
+
+    return templates.TemplateResponse(
+        request,
+        "smartsearch.html",
+        {"request": request, "course_types": course_types, "caste_types": caste_types,"selected_courses":courses,"selected_caste":caste,"selected_gender":gender,"selected_userrank":user_rank,"selected_phase":phase, "results": response }
+    )
+
 @app.get("/colleges/{inst_code}")
 def particular_college(session:SessionDep,request: Request,inst_code):
     statement=(select(Colleges,Courses_LastRank).join(Courses_LastRank,Colleges.inst_code==Courses_LastRank.inst_code))
@@ -332,3 +397,4 @@ def api_read_colleges( session: SessionDep, filters: CollegeFilter):
     response=db_querying(session,filters)
 
     return {"count":len(response),"results":response}
+
