@@ -371,23 +371,30 @@ def read_colleges( session: SessionDep,request: Request,courses: list[str] = For
     )
 
 @app.get("/colleges/{inst_code}")
-def particular_college(session:SessionDep,request: Request,inst_code):
-    statement=(select(Colleges,Courses_LastRank).join(Courses_LastRank,Colleges.inst_code==Courses_LastRank.inst_code))
-    statement=statement.where(Colleges.inst_code==inst_code)
-    results=session.exec(statement).all()
-    # response = []
-    # for college, course in results:
-    #     response.append({
-    #         "inst_code": college.inst_code,
-    #         "inst_name": college.inst_name,
-    #         "branch_code": course.branch_code,
-    #         "branch_name": course.branch_name
-    #     })
+def particular_college(session:SessionDep, request: Request, inst_code, phase: int = 3):
+    if phase == 1:
+        course_table = Courses_phase1
+    elif phase == 2:
+        course_table = Courses_phase2
+    else:
+        course_table = Courses_LastRank
+
+    statement = (select(Colleges, course_table)
+                 .join(course_table, Colleges.inst_code == course_table.inst_code))
+    statement = statement.where(Colleges.inst_code == inst_code)
+    results = session.exec(statement).all()
+
+    college = results[0][0] if results else None
 
     return templates.TemplateResponse(
         request,
         "college.html",
-        {"request": request,"results": results}
+        {
+            "request": request,
+            "results": results,
+            "selected_phase": phase,
+            "college": college
+        }
     )
     
 
@@ -397,4 +404,3 @@ def api_read_colleges( session: SessionDep, filters: CollegeFilter):
     response=db_querying(session,filters)
 
     return {"count":len(response),"results":response}
-

@@ -493,6 +493,12 @@
                         </div>
                         <div class="text-md-end text-muted fw-bold">{{ results|length }} branches</div>
                     </div>
+                    <div class="d-flex gap-2 mb-3">
+                        <a href="?phase=1" class="btn {% if selected_phase == 1 %}btn-primary{% else %}btn-outline-primary{% endif %}">Phase 1</a>
+                        <a href="?phase=2" class="btn {% if selected_phase == 2 %}btn-primary{% else %}btn-outline-primary{% endif %}">Phase 2</a>
+                        <a href="?phase=3" class="btn {% if selected_phase == 3 %}btn-primary{% else %}btn-outline-primary{% endif %}">Final</a>
+                    </div>
+
 
                     {% if results %}
                         <div class="d-grid gap-3">
