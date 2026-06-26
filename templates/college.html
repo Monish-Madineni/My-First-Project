@@ -353,17 +353,20 @@
 
             @media (max-width: 767px) {
                 .topbar .container {
-                    align-items: stretch !important;
-                    flex-direction: column;
+                    flex-wrap: wrap;
+                    align-items: center !important;
                 }
 
                 .topbar .d-flex.gap-2 {
-                    align-items: stretch;
-                    flex-direction: column;
+                    flex-wrap: wrap;
+                    align-items: center;
                 }
 
                 .college-search {
                     max-width: none;
+                    order: 3;
+                    width: 100%;
+                    flex: 0 0 100%;
                 }
 
                 .college-name {

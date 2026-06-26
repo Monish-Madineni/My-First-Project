@@ -533,12 +533,15 @@
 
             @media (max-width: 767px) {
                 .topbar .container {
-                    align-items: stretch !important;
-                    flex-direction: column;
+                    flex-wrap: wrap;
+                    align-items: center !important;
                 }
 
                 .college-search {
                     max-width: none;
+                    order: 3;
+                    width: 100%;
+                    flex: 0 0 100%;
                 }
 
                 .rank-grid,
