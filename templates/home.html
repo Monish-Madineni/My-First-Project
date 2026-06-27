@@ -554,7 +554,22 @@
         </style>
     </head>
     <link rel="icon" type="image/png" sizes="32x32" href="/static/MCL-Logo.png">
+    <script>
+        if (window.innerWidth < 768) {
+            document.getElementById("mobile-warning").classList.remove("d-none");
+        }
+    </script>
     <body>
+        <div id="mobile-warning"
+            class="alert alert-warning alert-dismissible fade show text-center m-0 d-none"
+            role="alert">
+            💻 For the best experience, use a laptop or desktop device. Mobile support is improving and some features may work better on larger screens.
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
         <nav class="site-nav py-3">
             <div class="container d-flex align-items-center justify-content-between gap-3">
                 <a class="brand-name" href="/">MyCollege<span>List</span></a>
@@ -578,7 +593,7 @@
                         <div class="col-lg-7">
                             <span class="hero-eyebrow mb-3">TG EAPCET college predictor</span>
                             <h1 class="hero-title fw-bold mb-3">Choose colleges with confidence, not guesswork.</h1>
-                            <p class="hero-copy mb-4">MyCollegeList helps TS EAPCET students search colleges by code or name, compare rank cutoffs across categories and phases, and build a shortlist that feels realistic before web options.</p>
+                            <p class="hero-copy mb-4">MyCollegeList helps TG EAPCET students search colleges by code or name, compare rank cutoffs across categories and phases, and build a shortlist that feels realistic before web options.</p>
 
                             <div class="hero-actions d-flex flex-wrap gap-2 mb-4">
                                 <a class="btn btn-primary btn-lg px-4" href="/smart_search/">Smart College Finder</a>
@@ -788,7 +803,7 @@
                     <div class="cta-card text-center">
                         <div class="section-label mb-2">Ready to compare</div>
                         <h2 class="section-title fw-bold mb-3">Start with your rank and build a cleaner shortlist.</h2>
-                        <p class="section-copy mx-auto mb-4" style="max-width: 720px;">Search colleges, compare branches, and review cutoff ranks in one place before you finalize your TS EAPCET web options.</p>
+                        <p class="section-copy mx-auto mb-4" style="max-width: 720px;">Search colleges, compare branches, and review cutoff ranks in one place before you finalize your TG EAPCET web options.</p>
                         <div class="d-flex flex-wrap justify-content-center gap-2">
                             <a class="btn btn-primary btn-lg px-4" href="/search/">Start Rank Search</a>
                             <a class="btn btn-outline-primary btn-lg px-4" href="#compare">View comparison</a>
