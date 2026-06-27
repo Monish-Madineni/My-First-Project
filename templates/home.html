@@ -558,13 +558,19 @@
         <div id="mobile-warning"
             class="alert alert-warning alert-dismissible fade show text-center m-0 d-none"
             role="alert">
-            💻 For the best experience, use a laptop or desktop device. Mobile support is improving and some features may work better on larger screens.
+            💻 For the best experience, a laptop or desktop device is recommended.
 
             <button type="button"
                     class="btn-close"
                     data-bs-dismiss="alert">
             </button>
         </div>
+
+        <script>
+            if (window.innerWidth < 768) {
+                document.getElementById("mobile-warning").classList.remove("d-none");
+            }
+        </script>
         <nav class="site-nav py-3">
             <div class="container d-flex align-items-center justify-content-between gap-3">
                 <a class="brand-name" href="/">MyCollege<span>List</span></a>
