@@ -244,16 +244,21 @@ def db_querying(session: Session, filters: CollegeFilter):
 
     if filters.upper_rank==112345678:
         safe_statement = statement.where(caste_column < filters.lower_rank).order_by(caste_column.desc()).limit(5)
+        if filters.courses:
+            safe_statement=safe_statement.where(course_table.branch_code.in_(filters.courses))
+        if caste_type[-1]=='b':
+            safe_statement=safe_statement.where(Colleges.coed=='COED')
         safe_results = session.exec(safe_statement).all()
-        results=session.exec(statement).all()
 
         safe_results.reverse()
-
         normal_statement = statement.where(caste_column >= filters.lower_rank)
+        if filters.courses:
+            normal_statement=normal_statement.where(course_table.branch_code.in_(filters.courses))
 
         if filters.upper_rank is not None:
             normal_statement = normal_statement.where(caste_column <= filters.upper_rank)
-
+        if caste_type[-1]=='b':
+            normal_statement=normal_statement.where(Colleges.coed=='COED')
         normal_statement = normal_statement.order_by(caste_column.asc())
         normal_results = session.exec(normal_statement).all()
 
@@ -284,6 +289,8 @@ def db_querying(session: Session, filters: CollegeFilter):
             statement=statement.where(caste_column>=filters.lower_rank)
         if filters.upper_rank is not None:
             statement=statement.where(caste_column<=filters.upper_rank)
+        if caste_type[-1]=='b':
+            statement=statement.where(Colleges.coed=='COED')
         
         #   COLLEGE FILTERS
 

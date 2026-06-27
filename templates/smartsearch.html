@@ -560,14 +560,34 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/MCL-Logo.png">
     <body>
         <nav class="topbar py-3">
-            <div class="container d-flex align-items-center justify-content-between gap-3">
+            <div class="container d-flex align-items-center justify-content-between">
+
+                <!-- Logo -->
                 <a class="brand-name" href="/">MyCollege<span>List</span></a>
-                <form class="college-search d-flex flex-grow-1 flex-md-grow-0" method="get" action="/college_search" role="search">
-                    <input class="form-control college-search-input" type="search" name="q" placeholder="Search college name or code" aria-label="Search college name or code" autocomplete="off" required>
-                    <button class="btn btn-primary ms-2" type="submit">Search</button>
+
+                <!-- Search -->
+                <form class="college-search d-flex" method="get" action="/college_search" role="search">
+                    <input
+                        class="form-control college-search-input"
+                        type="search"
+                        name="q"
+                        placeholder="Search college name or code"
+                        autocomplete="off"
+                        required
+                    >
+                    <button class="btn btn-primary ms-2" type="submit">
+                        Search
+                    </button>
+
                     <div class="college-suggestions"></div>
                 </form>
-                <a class="btn btn-outline-primary" href="/">Home</a>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex align-items-center gap-2">
+                    <a class="btn btn-primary" href="/search/">Browse Colleges</a>
+                    <a class="btn btn-outline-primary" href="/">Home</a>
+                </div>
+
             </div>
         </nav>
 
